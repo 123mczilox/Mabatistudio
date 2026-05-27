@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Mabati Studio — About{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about_contact.css' %}">
+{% endblock %}
+{% block content %}
+
+<header class="ac-hero text-white d-flex align-items-center">
+  <div class="overlay"></div>
+  <div class="container py-6">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h1 class="display-5 fw-bold">About Mabati Studio</h1>
+        <p class="lead mt-3">We design, supply and install premium roofing systems for industrial and residential projects — built to perform and engineered to last.</p>
+        <a href="{% url 'contact' %}" class="btn btn-primary btn-lg mt-3">Get a Consultation</a>
+      </div>
+      <div class="col-lg-5 text-center d-none d-lg-block">
+        <img src="{% static 'images/roofing.jpg' %}" alt="roof" class="img-fluid rounded shadow-lg">
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container my-5">
+  <section class="row g-4 align-items-center mb-5">
+    <div class="col-lg-6">
+      <h2 class="fw-bold">Industrial-grade materials, expert craftsmanship</h2>
+      <p class="text-muted">Our projects combine modern engineering with refined finishes — offering long service life, strong warranties and aesthetic choices that match contemporary architecture.</p>
+      <ul class="list-unstyled text-muted">
+        <li class="py-1">• ISO-quality steel coatings and anti-corrosion treatments</li>
+        <li class="py-1">• Trained installers with site safety and best-practices</li>
+        <li class="py-1">• Full project support: consultation, estimation, delivery, installation</li>
+      </ul>
+    </div>
+    <div class="col-lg-6">
+      <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col">
+          <div class="stat-card p-4 rounded-4 shadow-sm h-100">
+            <h3 class="display-6 mb-0">25+</h3>
+            <p class="mb-0 text-muted">Years combined experience</p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="stat-card p-4 rounded-4 shadow-sm h-100">
+            <h3 class="display-6 mb-0">10k+</h3>
+            <p class="mb-0 text-muted">Square meters installed</p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="stat-card p-4 rounded-4 shadow-sm h-100">
+            <h3 class="display-6 mb-0">30y</h3>
+            <p class="mb-0 text-muted">Top warranty option</p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="stat-card p-4 rounded-4 shadow-sm h-100">
+            <h3 class="display-6 mb-0">100%</h3>
+            <p class="mb-0 text-muted">Satisfaction-focused service</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- <section class="team mb-5">
+    <h3 class="fw-bold mb-3">Leadership & Team</h3>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card team-card h-100 p-3">
+          <img src="{% static 'images/front-stone-charcoal.png' %}" class="card-img-top rounded" alt="leader">
+          <div class="card-body">
+            <h5 class="card-title mb-1">Jane Doe</h5>
+            <p class="text-muted mb-0">Head of Projects</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card team-card h-100 p-3">
+          <img src="{% static 'images/front-versatile-red.png' %}" class="card-img-top rounded" alt="leader">
+          <div class="card-body">
+            <h5 class="card-title mb-1">John Mwangi</h5>
+            <p class="text-muted mb-0">Lead Engineer</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card team-card h-100 p-3">
+          <img src="{% static 'images/roofing.jpg' %}" class="card-img-top rounded" alt="leader">
+          <div class="card-body">
+            <h5 class="card-title mb-1">Aisha Abdullahi</h5>
+            <p class="text-muted mb-0">Operations Manager</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <section class="values mb-5">
+    <h3 class="fw-bold mb-3">Our Values</h3>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card p-4 h-100 shadow-sm">
+          <h5 class="fw-semibold">Quality</h5>
+          <p class="text-muted mb-0">We only use certified materials and follow strict QA during installation.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 h-100 shadow-sm">
+          <h5 class="fw-semibold">Safety</h5>
+          <p class="text-muted mb-0">Site safety is a non-negotiable part of every project we deliver.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 h-100 shadow-sm">
+          <h5 class="fw-semibold">Sustainability</h5>
+          <p class="text-muted mb-0">We optimize materials and waste for efficiency and lower environmental impact.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- <footer class="bg-dark text-white py-4">
+  <div class="container d-flex justify-content-between align-items-center">
+    <div>&copy; Mabati Studio</div>
+    <div><a href="{% url 'contact' %}" class="text-white text-decoration-none">Contact</a></div>
+  </div>
+</footer> -->
+
+{% endblock %}
+

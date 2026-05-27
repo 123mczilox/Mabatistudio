@@ -1,0 +1,23 @@
+/* Shared styles for About and Contact pages */
+.ac-hero {
+  position: relative;
+  background: linear-gradient(180deg, rgba(10, 25, 44, 0.7), rgba(10,25,44,0.86)), url('/static/images/roofing.jpg') center/cover no-repeat;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+}
+.ac-hero .overlay { position: absolute; inset: 0; }
+.stat-card { background: #fff; border: 1px solid rgba(15,23,42,0.06); }
+.team-card img { height: 160px; object-fit: cover; }
+.team-card .card-body { text-align: center; }
+.card .fw-bold { color: #0f172a; }
+.contact .card { border-radius: .75rem; }
+.stat-card h3 { color: #0b4a6f; }
+
+/* Contact form tweaks */
+#contact-form .form-control:focus { box-shadow: none; border-color: #0b66b2; }
+
+@media (max-width: 767px) {
+  .ac-hero { min-height: 280px; }
+  .team-card img { height: 200px; }
+}

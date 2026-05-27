@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" id="waranty">
+  <defs>
+    <linearGradient id="a" x1="32" x2="32" y1="6.85" y2="62.26" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff005d"></stop>
+      <stop offset="1" stop-color="#ff5924"></stop>
+    </linearGradient>
+    <linearGradient id="b" x1="24.34" x2="39.66" y1="28.2" y2="28.2" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e3effc"></stop>
+      <stop offset="1" stop-color="#9cbfe5"></stop>
+    </linearGradient>
+  </defs>
+  <path fill="url(#a)" d="M51.17,13.69c-7.54-2.37-18-9.28-18.06-9.35h0a1.7,1.7,0,0,0-.35-.19l-.22-.07-.15,0-.26,0H32l-.25,0-.13,0a2,2,0,0,0-.33.09l0,0a1.55,1.55,0,0,0-.36.19c-.16.1-10.54,7-18.06,9.35A4.06,4.06,0,0,0,10,17.57V38a2,2,0,0,0,.18.84c.26.56,6.49,13.77,21,20l.15,0,.14,0A2.08,2.08,0,0,0,32,59h0a2.08,2.08,0,0,0,.5-.07l.14,0,.15,0c14.54-6.23,20.77-19.44,21-20A2,2,0,0,0,54,38V17.57A4.06,4.06,0,0,0,51.17,13.69Z"></path>
+  <path fill="url(#b)" d="M39.08,23.25a2,2,0,0,0-2.83,0l-5.66,5.66-2.84-2.84a2,2,0,0,0-2.83,2.83l4.25,4.25a2,2,0,0,0,1.42.59A2,2,0,0,0,32,33.15l7.08-7.07A2,2,0,0,0,39.08,23.25Z"></path>
+</svg>

@@ -1,0 +1,640 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Mabati Studio{% endblock %}
+{% block content %}
+
+    <section class="hero-section d-flex align-items-center">
+    <div class="container mt-5">
+        <h1 class="display-3 fw-bold hero-title">
+            Shield Your Home,<br>Enhance Your Style
+
+        </h1>
+        <div class="hero-accent-bar mb-4"></div>
+        <p class="lead mt-4 text-muted flex-grow-2 hero-subtitle">
+           Protect your property with durable, weather-resistant roofing. We supply quality imported Decra tiles and locally manufactured Mabati with a 50-year warranty and free countrywide delivery.
+        </p>
+
+    <a href="{% url 'contact' %}" class="btn btn-outline-danger btn-lg me-3 hero-cta">Get a Free Quote</a>
+    <a href="tel:0792017423" class="btn btn-outline-secondary btn-lg hero-cta"><i class="fa-solid fa-phone" style="color: rgb(139, 213, 182);"></i> Call Us: 0792017423</a>
+    </div>
+</section>
+<section class ="stats-section py-5">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3">
+                <div class="stats-card p-4 rounded-4 shadow-sm bg-white h-100">
+                    <h2 class="display-4">10+</h2>
+                    <p class="lead flex-grow-1">Years of Experience</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card p-4 rounded-4 shadow-sm bg-white h-100">
+                    <h2 class="display-4">500+</h2>
+                    <p class="lead flex-grow-1">Happy Customers</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card p-4 rounded-4 shadow-sm bg-white h-100">
+                    <h2 class="display-4">100%</h2>
+                    <p class="lead flex-grow-1">Satisfaction Rate</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card p-4 rounded-4 shadow-sm bg-white h-100">
+                    <h2 class="display-4">50+</h2>
+                    <p class="lead flex-grow-1">Projects Completed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="services-section py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Our Services</h2>
+        <div class="row g-4"> 
+              <!-- card 1 -->  
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card service-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-4 text-center">
+                <img src="{% static 'images/roof.svg' %}" class="card-img-top service-card-logo" alt="Roofing logo">
+              </div>
+              <div class="card-body d-flex flex-column">
+
+    <h6 class="card-subtitle mb-2 text-body-secondary fs-3">Quality roofing materials supply.</h6>
+    <p class="card-text flex-grow-1">We supply the highest quality imported and locally manufactured roofing materials.</p>
+ <ul>
+    <li>Decra Stone Coated Tiles</li>
+    <li>Locally Manufactured Mabati</li>
+    <li>Wide Variety of Products</li>
+ </ul>
+              </div>
+            </div>
+          </div>
+
+
+<!-- card 2 -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-4 text-center">
+                 <img src="{% static 'images/delivery-service.svg' %}" class="card-img-top service-card-logo" alt="Roofing logo">
+              </div>
+              <div class="card-body d-flex flex-column">
+               
+                <h6 class="card-subtitle mb-2 text-body-secondary fs-3">Free Countrywide Delivery</h6>
+                <p class="card-text flex-grow-1">Enjoy free delivery anywhere in Kenya for all your roofing material orders.</p>
+                <div class="mt-auto">
+                    <ul>
+                        <li>Fast Delivery </li>
+                        <li>Safe Handling</li>
+                        <li>Track Your Order</li>
+                    </ul>
+    
+                </div>
+              </div>
+            </div>
+          </div>
+<!-- card 3 -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-4 text-center">
+              <img src="{% static 'images/repair-tool.svg' %}" class="card-img-top service-card-logo" alt="Services logo">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-subtitle mb-2 text-body-secondary fs-3">Expert Installation Services</h6>
+                <p class="card-text flex-grow-1">Professional roofing installation by certified contractors with years of experience.</p>
+                <div class="mt-auto">
+                          <ul>
+                        <li>Skilled Professionals </li>
+                        <li>Quality Workmanship</li>
+                        <li>Timely Completion</li>
+                    </ul>
+              
+                </div>
+              </div>
+            </div>
+          </div>
+<!-- card 4 -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-4 text-center">
+                <img src="{% static 'images/waranty.svg' %}" class="card-img-top service-card-logo" alt="Visualizer logo">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-subtitle mb-2 text-body-secondary fs-3">50-Year Warranty</h6>
+                <p class="card-text flex-grow-1">All our Decra tiles come with an industry-leading 50-year warranty for peace of mind.</p>
+                <div class="mt-auto">
+                    <ul>
+                        <li>Long-lasting Protection</li>
+                        <li>Weather Resistant</li>
+                        <li>Quality Assurance</li>
+                    </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+<!-- card 5 -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-4 text-center">
+                <img src="{% static 'images/car-repair-location.svg' %}" class="card-img-top service-card-logo" alt="Visualizer logo">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-subtitle mb-2 text-body-secondary fs-3">Roof Repairs & Maintenance</h6>
+                <p class="card-text flex-grow-1">Fix leaking roofs and maintain your existing roofing for optimal performance.</p>
+                <div class="mt-auto">
+                    <ul>
+                        <li>Leak Repairs</li>
+                        <li>Maintenance Plans</li>
+                        <li>Emergency Services</li>
+                    </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+<!--card 6 -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-4 text-center">
+              <img src="{% static 'images/consultation.svg' %}" class="card-img-top service-card-logo" alt="Services logo">
+              </div>
+              <div class="card-body d-flex flex-column">
+            
+                <h6 class="card-subtitle mb-2 text-body-secondary fs-3">Free Consultation</h6>
+                <p class="card-text flex-grow-1">Get expert advice on the best roofing solutions for your specific needs.</p>
+                <div class="mt-auto">
+                    <ul>
+                        <li>Professional Assessment</li>
+                        <li>Material Recommendations</li>
+                        <li>Cost Estimates</li>
+                    </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <h2 class="fw-bold">
+                Roofing Profiles
+            </h2>
+
+            <p class="text-muted">
+                Explore our premium roofing options.
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Box Profile -->
+            <div class="col-md-6 col-lg-3">
+
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-3 text-center">
+                    <img src="{% static 'images/box-profile.png' %}" class="card-img-top">
+              </div>
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="fw-bold text-primary">
+                            Box Profile
+                        </h5>
+
+                        <p class="text-muted flex-grow-1">
+                            Affordable and durable roofing solution.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#D65A31"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#1E6F47"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#2B5074"></span>
+                        </div>
+                        <a href="{% url 'products' %}" class="btn btn-outline-primary mt-auto">
+                            View details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Versatile -->
+            <div class="col-md-6 col-lg-3">
+
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-3 text-center">
+                    <img src="{% static 'images/versatile.png' %}" class="card-img-top">
+              </div>
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="fw-bold text-primary">
+                            Versatile Tile
+                        </h5>
+
+                        <p class="text-muted flex-grow-1">
+                            Elegant tile-like roofing profile.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#B0553D"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#3E5F8A"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#4A7D45"></span>
+                        </div>
+                        <a href="{% url 'products' %}" class="btn btn-outline-primary mt-auto">
+                            View details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Corrugated -->
+            <div class="col-md-6 col-lg-3">
+
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-3 text-center">
+                    <img src="{% static 'images/corrugated.png' %}" class="card-img-top">
+              </div>
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="fw-bold text-primary">
+                            Corrugated
+                        </h5>
+
+                        <p class="text-muted flex-grow-1">
+                            Traditional and reliable roofing style.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#8F6133"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#4F6A33"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#2F4E6F"></span>
+                        </div>
+                        <a href="{% url 'products' %}" class="btn btn-outline-primary mt-auto">
+                            View details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- zeetile -->
+                <div class="col-md-6 col-lg-3">
+
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-3 text-center">
+                    <img src="{% static 'images/zeetile.png' %}" class="card-img-top">
+              </div>
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="fw-bold text-primary">
+                            Zeetile
+                        </h5>
+
+                        <p class="text-muted flex-grow-1">
+                            Modern and stylish roofing option.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#B43E53"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#5E5A7A"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#3F6B36"></span>
+                        </div>
+                        <a href="{% url 'products' %}" class="btn btn-outline-primary mt-auto">
+                            View details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+          
+                       
+            <!-- Stone Coated -->
+            <div class="col-md-6 col-lg-3">
+
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+              <div class="bg-primary-subtle p-3 text-center">
+                    <img src="{% static 'images/stone-coated.png' %}" class="card-img-top">
+              </div>
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="fw-bold text-primary">
+                            Stone Coated
+                        </h5>
+
+                        <p class="text-muted flex-grow-1">
+                            Premium New Zealand-inspired roofing system.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#A16E44"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#4C6D7A"></span>
+                            <span class="rounded-circle border" style="display:inline-block;width:16px;height:16px;background:#3A5F34"></span>
+                        </div>
+                        <a href="{% url 'products' %}" class="btn btn-outline-primary mt-auto">
+                            View details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <!-- Heading -->
+        <div class="text-center mb-5">
+
+            <h2 class="fw-bold">
+                Why Choose Mabati Studio
+            </h2>
+
+            <p class="text-muted">
+                Trusted roofing solutions designed for modern construction.
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Item 1 -->
+            <div class="col-md-6 col-lg-3">
+
+                <div>
+
+                    <h1 class="display-1 text-secondary opacity-25 fw-bold">
+                        01
+                    </h1>
+
+                    <h4 class="fw-bold">
+                        Premium Quality
+                    </h4>
+
+                    <p class="text-muted">
+                        Durable roofing systems built for long-term performance and protection.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- Item 2 -->
+            <div class="col-md-6 col-lg-3">
+
+                <div>
+
+                    <h1 class="display-1 text-secondary opacity-25 fw-bold">
+                        02
+                    </h1>
+
+                    <h4 class="fw-bold">
+                        Roof Visualizer
+                    </h4>
+
+                    <p class="text-muted">
+                        Preview roofing colors and profiles before making your final choice.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- Item 3 -->
+            <div class="col-md-6 col-lg-3">
+
+                <div>
+
+                    <h1 class="display-1 text-secondary opacity-25 fw-bold">
+                        03
+                    </h1>
+
+                    <h4 class="fw-bold">
+                        Fast Delivery
+                    </h4>
+
+                    <p class="text-muted">
+                        Quick and efficient delivery of roofing materials across Kenya.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- Item 4 -->
+            <div class="col-md-6 col-lg-3">
+
+                <div>
+
+                    <h1 class="display-1 text-secondary opacity-25 fw-bold">
+                        04
+                    </h1>
+
+                    <h4 class="fw-bold">
+                        Expert Guidance
+                    </h4>
+
+                    <p class="text-muted">
+                        Professional support to help you choose the right roofing solution.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="row align-items-center g-5">
+
+            <!-- LEFT SIDE IMAGE -->
+            <div class="col-lg-6">
+
+                <img 
+                    src="{% static 'images/visualizer-preview.jpg' %}" 
+                    class="img-fluid rounded shadow"
+                    alt="Roof Visualizer Preview"
+                >
+
+            </div>
+
+            <!-- RIGHT SIDE CONTENT -->
+            <div class="col-lg-6">
+
+                <p class="text-uppercase text-muted fw-bold">
+                    Interactive Experience
+                </p>
+
+                <h2 class="fw-bold mb-4">
+                    Visualize Your Roof Before Installation
+                </h2>
+
+                <p class="text-muted mb-4">
+                    Explore different roofing profiles, colors, and styles using our modern roof visualizer before making your final decision.
+                </p>
+
+                <!-- Small Features -->
+                <div class="mb-3">
+                    ✅ Compare roofing styles
+                </div>
+
+                <div class="mb-3">
+                    ✅ Preview color combinations
+                </div>
+
+                <div class="mb-4">
+                    ✅ Make confident roofing decisions
+                </div>
+
+                <!-- CTA BUTTON -->
+                <a href="{% url 'visualizer' %}" class="btn btn-dark btn-lg">
+                    Launch Visualizer
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <!-- Heading -->
+        <div class="text-center mb-5">
+
+            <h2 class="fw-bold">
+               Recent Roofing Projects
+            </h2>
+
+            <p class="text-muted">
+                Explore some of our completed roofing installations and modern designs.
+            </p>
+
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="row g-4">
+
+            <!-- Image 1 -->
+            <div class="col-md-6 col-lg-3">
+
+                <img 
+                    src="{% static 'images/project1.png' %}" 
+                    class="img-fluid rounded shadow-sm"
+                    alt="Roofing Project"
+                >
+
+            </div>
+
+            <!-- Image 2 -->
+            <div class="col-md-6 col-lg-3">
+
+                <img 
+                    src="{% static 'images/project2.png' %}" 
+                    class="img-fluid rounded shadow-sm"
+                    alt="Roofing Project"
+                >
+
+            </div>
+
+            <!-- Image 3 -->
+            <div class="col-md-6 col-lg-3">
+
+                <img 
+                    src="{% static 'images/project3.png' %}" 
+                    class="img-fluid rounded shadow-sm"
+                    alt="Roofing Project"
+                >
+
+            </div>
+
+            <!-- Image 4 -->
+            <div class="col-md-6 col-lg-3">
+
+                <img 
+                    src="{% static 'images/project4.png' %}" 
+                    class="img-fluid rounded shadow-sm"
+                    alt="Roofing Project"
+                >
+
+            </div>
+
+        </div>
+
+        <!-- CTA -->
+        <div class="text-center mt-5">
+
+            <a href="{% url 'gallery' %}" class="btn btn-dark btn-lg">
+                View Full Gallery
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+<footer class="bg-danger text-white py-5 mt-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3">Mabati Studio</h5>
+        <p class="text-muted">Providing durable, weather-resistant roofing solutions across Kenya with top-tier materials and expert craftsmanship.</p>
+      </div>
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3">Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-muted text-decoration-none">Our Services</a></li>
+          <li><a href="#" class="text-muted text-decoration-none">Roofing Profiles</a></li>
+          <li><a href="#" class="text-muted text-decoration-none">Visualizer Tool</a></li>
+          <li><a href="#" class="text-muted text-decoration-none">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3">Contact Info</h5>
+        <p class="text-muted mb-1"><i class="fa-solid fa-location-dot me-2"></i>Nairobi, Kenya</p>
+        <p class="text-muted mb-1"><i class="fa-solid fa-phone me-2"></i>0792017423</p>
+        <p class="text-muted"><i class="fa-solid fa-envelope me-2"></i>info@mabatistudio.co.ke</p>
+      </div>
+    </div>
+    <hr class="text-muted my-4">
+    <div class="text-center text-muted">
+      <p class="mb-0">&copy; 2026 Mabati Studio. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>
+
+
+{% block extra_js %}
+<script src="{% static 'js/main.js' %}"></script>
+{% endblock %}
+{% endblock %}
