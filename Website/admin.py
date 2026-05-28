@@ -7,7 +7,7 @@ from django.db.models import Q
 admin.site.site_header = "MabatiHubKenya Admin"
 admin.site.site_title = "MabatiHubKenya Admin Portal"
 admin.site.index_title = "MabatiHubKenya Administration"
-from .models import Product, ColorVariant, RoofType, ContactMessage, GalleryImage, ProductImage
+from .models import Product, ColorVariant, ProductType, ContactMessage, GalleryImage, ProductImage
 
 
 class ProductImageInline(admin.TabularInline):
@@ -26,18 +26,18 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'roof_type', 'price', 'gauge', 'featured', 'created_at', 'thumbnail')
+    list_display = ('name', 'product_type', 'price', 'gauge', 'featured', 'created_at', 'thumbnail')
     list_display_links = ('name',)
     list_editable = ('price', 'gauge', 'featured')
     list_per_page = 25
     search_fields = ('name', 'description')
-    list_filter = ('roof_type', 'featured', 'created_at', 'color_variants')
+    list_filter = ('product_type', 'featured', 'created_at', 'color_variants')
     date_hierarchy = 'created_at'
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductImageInline]
     readonly_fields = ('thumbnail',)
     filter_horizontal = ('color_variants',)
-    autocomplete_fields = ('roof_type',)
+    autocomplete_fields = ('product_type',)
 
     def thumbnail(self, obj):
         url = obj.main_image_url
@@ -63,8 +63,8 @@ class ProductImageAdmin(admin.ModelAdmin):
     preview.short_description = 'Preview'
 
 
-@admin.register(RoofType)
-class RoofTypeAdmin(admin.ModelAdmin):
+@admin.register(ProductType)
+class ProductTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name',)

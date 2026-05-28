@@ -3,13 +3,13 @@ from django.utils.text import slugify
 from django.urls import reverse
 
 
-class RoofType(models.Model):
+class ProductType(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
 
     class Meta:
-        verbose_name = 'Roof Type'
-        verbose_name_plural = 'Roof Types'
+        verbose_name = 'Product Type'
+        verbose_name_plural = 'Product Types'
 
     def __str__(self):
         return self.name
@@ -41,7 +41,7 @@ class ColorVariant(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
-    roof_type = models.ForeignKey(RoofType, on_delete=models.SET_NULL, null=True, related_name='products')
+    product_type = models.ForeignKey(ProductType, on_delete=models.SET_NULL, null=True, related_name='products')
     gauge = models.CharField(max_length=20, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     color_variants = models.ManyToManyField(ColorVariant, blank=True, related_name='products', help_text='Select all available colors for this product')
