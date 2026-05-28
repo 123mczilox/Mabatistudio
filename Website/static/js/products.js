@@ -1,4 +1,4 @@
-// Products page interactions for Mabati Studio
+// Products page interactions for MabatiHubKenya
 
 document.addEventListener('DOMContentLoaded', () => {
     // Smooth scroll when clicking category cards

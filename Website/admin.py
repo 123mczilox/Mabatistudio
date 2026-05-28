@@ -1,12 +1,21 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import ContactMessage, Product, ProductImage, RoofType, ColorVariant, GalleryImage
+from django.urls import reverse
+from django.db.models import Q
+
+# Customize the Django admin site appearance
+admin.site.site_header = "MabatiHubKenya Admin"
+admin.site.site_title = "MabatiHubKenya Admin Portal"
+admin.site.index_title = "MabatiHubKenya Administration"
+from .models import Product, ColorVariant, RoofType, ContactMessage, GalleryImage, ProductImage
 
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
     readonly_fields = ('preview',)
+    fields = ('image', 'view_type', 'alt_text', 'order', 'preview')
+    ordering = ('order',)
 
     def preview(self, obj):
         if obj.image:
@@ -18,11 +27,17 @@ class ProductImageInline(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'roof_type', 'price', 'gauge', 'featured', 'created_at', 'thumbnail')
+    list_display_links = ('name',)
+    list_editable = ('price', 'gauge', 'featured')
+    list_per_page = 25
     search_fields = ('name', 'description')
-    list_filter = ('roof_type', 'featured', 'created_at')
+    list_filter = ('roof_type', 'featured', 'created_at', 'color_variants')
+    date_hierarchy = 'created_at'
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductImageInline]
     readonly_fields = ('thumbnail',)
+    filter_horizontal = ('color_variants',)
+    autocomplete_fields = ('roof_type',)
 
     def thumbnail(self, obj):
         url = obj.main_image_url
@@ -35,6 +50,10 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
     list_display = ('product', 'view_type', 'order', 'preview')
+    list_editable = ('order',)
+    list_filter = ('view_type',)
+    search_fields = ('product__name',)
+    list_per_page = 50
     readonly_fields = ('preview',)
 
     def preview(self, obj):
@@ -48,12 +67,15 @@ class ProductImageAdmin(admin.ModelAdmin):
 class RoofTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
+    search_fields = ('name',)
 
 
 @admin.register(ColorVariant)
 class ColorVariantAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'hex_code')
     prepopulated_fields = {'slug': ('name',)}
+    list_editable = ('hex_code',)
+    search_fields = ('name', 'hex_code')
 
 
 @admin.register(ContactMessage)
@@ -63,11 +85,24 @@ class ContactMessageAdmin(admin.ModelAdmin):
     search_fields = ('name', 'email', 'phone', 'message')
     readonly_fields = ('name', 'email', 'phone', 'message', 'submitted_at')
     ordering = ('-submitted_at',)
+    actions = ('mark_as_read', 'mark_as_unread')
+
+    def mark_as_read(self, request, queryset):
+        updated = queryset.update(is_read=True)
+        self.message_user(request, f"{updated} message(s) marked as read.")
+    mark_as_read.short_description = 'Mark selected messages as read'
+
+    def mark_as_unread(self, request, queryset):
+        updated = queryset.update(is_read=False)
+        self.message_user(request, f"{updated} message(s) marked as unread.")
+    mark_as_unread.short_description = 'Mark selected messages as unread'
 
 
 @admin.register(GalleryImage)
 class GalleryImageAdmin(admin.ModelAdmin):
     list_display = ('title', 'uploaded_at', 'order', 'preview')
+    list_editable = ('order',)
+    list_filter = ('uploaded_at',)
     readonly_fields = ('preview',)
     list_display_links = ('title',)
 
@@ -76,3 +111,5 @@ class GalleryImageAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="height:60px;" />', obj.image.url)
         return ''
     preview.short_description = 'Preview'
+
+

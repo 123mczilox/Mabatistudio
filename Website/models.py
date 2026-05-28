@@ -133,3 +133,5 @@ class GalleryImage(models.Model):
 
     def __str__(self):
         return self.title or (self.image.name.split('/')[-1] if self.image else 'Gallery image')
+
+

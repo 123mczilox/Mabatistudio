@@ -105,3 +105,5 @@ def product_detail(request, slug):
         'current_page': 'products',
     }
     return render(request, 'product_detail.html', context)
+
+
