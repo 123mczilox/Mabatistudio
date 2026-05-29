@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
+from core.supa_storage import upload_image
 
 
 class ProductType(models.Model):
@@ -23,7 +24,7 @@ class ProductType(models.Model):
 class ColorVariant(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
-    hex_code = models.CharField(max_length=7, blank=True, null=True, help_text='Optional hex color code, e.g. #RRGGBB')
+    hex_code = models.CharField(max_length=7, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Color Variant'
@@ -41,15 +42,32 @@ class ColorVariant(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
-    product_type = models.ForeignKey(ProductType, on_delete=models.SET_NULL, null=True, related_name='products')
+
+    product_type = models.ForeignKey(
+        ProductType,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='products'
+    )
+
     gauge = models.CharField(max_length=20, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    color_variants = models.ManyToManyField(ColorVariant, blank=True, related_name='products', help_text='Select all available colors for this product')
+
+    color_variants = models.ManyToManyField(
+        ColorVariant,
+        blank=True,
+        related_name='products'
+    )
+
     warranty = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
-    features = models.JSONField(blank=True, null=True, default=list, help_text='A JSON list of feature strings')
-    image = models.ImageField(upload_to='products/', blank=True, null=True, help_text='Main product image')
+    features = models.JSONField(blank=True, null=True, default=list)
+
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
+
     featured = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -60,27 +78,43 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        # STEP 1: slug generation
         if not self.slug:
             base = slugify(self.name)
             slug = base
             counter = 1
+
             while Product.objects.filter(slug=slug).exclude(pk=self.pk).exists():
                 slug = f"{base}-{counter}"
                 counter += 1
+
             self.slug = slug
+
+        # STEP 2: save product first
         super().save(*args, **kwargs)
+
+        # STEP 3: upload image to Supabase
+        if self.image and not self.image_url:
+            with self.image.open("rb") as f:
+                url = upload_image(f, self.image.name)
+
+            self.image_url = url
+
+            # update only image_url (prevents recursion issues)
+            Product.objects.filter(pk=self.pk).update(image_url=url)
 
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
 
     @property
     def main_image_url(self):
-        # prefer the main image, otherwise any related images
-        if self.image:
-            return self.image.url
+        if self.image_url:
+            return self.image_url
+
         first = self.images.first() if hasattr(self, 'images') else None
         if first and first.image:
             return first.image.url
+
         return ''
 
 
@@ -91,7 +125,13 @@ class ProductImage(models.Model):
         ('top', 'Top'),
         ('detail', 'Detail'),
     ]
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='images'
+    )
+
     image = models.ImageField(upload_to='products/gallery/')
     view_type = models.CharField(max_length=20, choices=VIEW_CHOICES, default='front')
     alt_text = models.CharField(max_length=200, blank=True)
@@ -114,11 +154,9 @@ class ContactMessage(models.Model):
 
     class Meta:
         ordering = ['-submitted_at']
-        verbose_name = 'Contact Message'
-        verbose_name_plural = 'Contact Messages'
 
     def __str__(self):
-        return f"{self.name} <{self.email}> - {self.submitted_at:%Y-%m-%d %H:%M}"
+        return f"{self.name} <{self.email}>"
 
 
 class GalleryImage(models.Model):
@@ -132,6 +170,4 @@ class GalleryImage(models.Model):
         ordering = ['-uploaded_at', 'order']
 
     def __str__(self):
-        return self.title or (self.image.name.split('/')[-1] if self.image else 'Gallery image')
-
-
+        return self.title or self.image.name.split('/')[-1]

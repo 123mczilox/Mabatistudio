@@ -1,3 +1,4 @@
+
 """
 Django settings for core project.
 
@@ -10,8 +11,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+
 import os
 from pathlib import Path
+
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,14 +84,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        os.environ.get('DATABASE_URL', )
+    )
+       
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -154,3 +156,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+AWS_ACCESS_KEY_ID = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1aGthcnJqbWx3andqdGJ5c25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzA1OTgsImV4cCI6MjA5NTU0NjU5OH0.VboR8D3WOSQZbgOSKcQffYb6Z-Lv79ES5RyLtOgRugA"
+AWS_SECRET_ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1aGthcnJqbWx3andqdGJ5c25uIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTk3MDU5OCwiZXhwIjoyMDk1NTQ2NTk4fQ.xpcHuc1Qojq308mOaiGEj6nM8CwviTvN2OMVO5hYAzM"
+AWS_STORAGE_BUCKET_NAME = "product.images"
+AWS_S3_ENDPOINT_URL = "https://juhkarrjmlwjwjtbysnn.supabase.co/storage/v1/s3"
