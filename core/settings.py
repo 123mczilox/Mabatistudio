@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Website',
     'rest_framework',
+    'storages',
     
 ]
 
@@ -158,7 +159,7 @@ X_FRAME_OPTIONS = 'DENY'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-AWS_ACCESS_KEY_ID = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1aGthcnJqbWx3andqdGJ5c25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzA1OTgsImV4cCI6MjA5NTU0NjU5OH0.VboR8D3WOSQZbgOSKcQffYb6Z-Lv79ES5RyLtOgRugA"
-AWS_SECRET_ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1aGthcnJqbWx3andqdGJ5c25uIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTk3MDU5OCwiZXhwIjoyMDk1NTQ2NTk4fQ.xpcHuc1Qojq308mOaiGEj6nM8CwviTvN2OMVO5hYAzM"
+AWS_ACCESS_KEY_ID = "juhkarrjmlwjwjtbysnn"
+AWS_SECRET_ACCESS_KEY = "sb_secret_YVKJYgC_VBpog0Dyo6TJ_g_-VwI8wSh"
 AWS_STORAGE_BUCKET_NAME = "product.images"
 AWS_S3_ENDPOINT_URL = "https://juhkarrjmlwjwjtbysnn.supabase.co/storage/v1/s3"
