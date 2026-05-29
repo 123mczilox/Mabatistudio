@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}MabatiHubKenya | Roof Visualizer{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/visualizer.css' %}">
+{% endblock %}
+{% block content %}
+
+<section class="visualizer-hero">
+    <div class="container py-6">
+        <div class="row align-items-center gy-4">
+            <div class="col-lg-7 hero-copy">
+                <span class="badge bg-white text-dark rounded-pill mb-3">Roofing Configurator</span>
+                <h1 class="fw-bold mb-3">Imagine your next roof before the first nail is set.</h1>
+                <p class="lead mb-4">MabatiHubKenya’s interactive visualizer helps you choose the right roof profile, color, and view with premium design previews that feel polished and professional.</p>
+                <a href="#configurator" class="btn btn-outline-light btn-lg me-3">Start Configuring</a>
+                <a href="{% url 'contact' %}" class="btn btn-light btn-lg">Request a Quote</a>
+            </div>
+            <div class="col-lg-5">
+                <div class="card rounded-4 p-4 shadow-lg" style="background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.16);">
+                    <h5 class="text-white mb-3">Why use the roof visualizer?</h5>
+                    <ul class="list-unstyled text-white-75 lh-lg">
+                        <li><i class="fa-solid fa-check text-success me-2"></i>Choose roof type and color instantly.</li>
+                        <li><i class="fa-solid fa-check text-success me-2"></i>View front, side, and top perspectives.</li>
+                        <li><i class="fa-solid fa-check text-success me-2"></i>See roofing details, warranty, and pricing.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="configurator" class="configurator-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="preview-card">
+                    <div class="preview-header d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-1 text-uppercase text-white-50 small">Interactive preview</p>
+                            <h4 class="mb-0">Roof view panel</h4>
+                        </div>
+                        <span class="badge bg-white text-dark">Live update</span>
+                    </div>
+                    <div class="preview-body">
+                        <img id="roofImage" src="{% static 'images/front-box-red.png' %}" alt="Roof preview" />
+                        <div class="view-toggle mt-4">
+                            <button type="button" class="btn btn-sm" data-view="front">Front View</button>
+                            <button type="button" class="btn btn-sm" data-view="side">Side View</button>
+                            <button type="button" class="btn btn-sm" data-view="top">Top View</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="config-card sticky-panel">
+                    <div class="control-group">
+                        <h5>Roof Type</h5>
+                        <div class="roof-type-options">
+                            {% for roof_type in roof_types %}
+                                <button type="button" class="roof-type-button" data-roof-type="{{ roof_type.slug }}">
+                                    <i class="fa-solid fa-house-roof fa-lg"></i>
+                                    <span>{{ roof_type.name }}</span>
+                                </button>
+                            {% empty %}
+                                <p class="text-muted">No roof types available yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <h5>Roof Color</h5>
+                        <div class="roof-color-options">
+                            {% for color in color_variants %}
+                                <div class="color-swatch" data-color="{{ color.slug }}" style="background: {{ color.hex_code|default:"#ccc" }};">
+                                    <span>{{ color.name }}</span>
+                                </div>
+                            {% empty %}
+                                <p class="text-muted">No colors available yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="spec-card roof-specs">
+                        <h5>Roof Specifications</h5>
+                        <div class="spec-row">
+                            <div class="spec-card-item">
+                                <strong>Roof Style</strong>
+                                <p id="detailType" class="mb-0">Box Profile</p>
+                            </div>
+                            <div class="spec-card-item">
+                                <strong>Gauge</strong>
+                                <p id="detailGauge" class="mb-0">26 & 28</p>
+                            </div>
+                            <div class="spec-card-item">
+                                <strong>Warranty</strong>
+                                <p id="detailWarranty" class="mb-0">20 year corrosion warranty</p>
+                            </div>
+                            <div class="spec-card-item">
+                                <strong>Price Range</strong>
+                                <p id="detailPrice" class="mb-0">Ksh 180 - 260 / sqft</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <strong>Details</strong>
+                            <p id="detailDescription" class="mb-0">Clean lines and efficient water flow for a modern pitched roof.</p>
+                        </div>
+                    </div>
+
+                    <div class="request-cta">
+                        <a href="{% url 'contact' %}" class="btn btn-primary btn-lg">
+                            Request Quote
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+<script>window.visualizerImageBase = "{% static 'images/' %}";</script>
+{{ roof_types_data|json_script:'roof-types-data' }}
+{{ color_variants_data|json_script:'color-variants-data' }}
+<script src="{% static 'js/visualizer.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/js/all.min.js"></script>
+{% endblock %}
+{% endblock %}

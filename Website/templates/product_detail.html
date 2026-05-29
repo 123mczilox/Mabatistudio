@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ product.name }} — MabatiHubKenya{% endblock %}
+{% block content %}
+<main class="container py-5">
+    <div class="mb-4">
+      <a class="btn btn-outline-secondary" href="{% url 'products' %}" onclick="event.preventDefault(); window.history.back();">← Back to Products</a>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {% if product.main_image_url %}
+                <img src="{{ product.main_image_url }}" class="img-fluid rounded" alt="{{ product.name }}">
+            {% else %}
+                <img src="{% static 'images/products/versatile/versatile-thumb.jpg' %}" class="img-fluid rounded" alt="{{ product.name }}">
+            {% endif %}
+
+            <div class="mt-3 d-flex gap-2 align-items-center">
+                {% for img in product.images.all %}
+                    <img src="{{ img.image.url }}" alt="{{ img.alt_text }}" style="height:60px; width:auto;" class="rounded border">
+                {% empty %}
+                    <!-- no gallery images -->
+                {% endfor %}
+            </div>
+
+            {% if color_variants %}
+            <div class="mt-4">
+                <h6 class="mb-2">Available colors</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for col in color_variants %}
+                        <a href="{% url 'products' %}?color={{ col.slug }}" class="d-inline-flex align-items-center text-decoration-none">
+                            <span class="me-2 rounded-circle" style="display:inline-block; width:28px; height:28px; border:1px solid #ddd; background: {{ col.hex_code|default:'#ffffff' }};"></span>
+                            <small class="text-muted">{{ col.name }}</small>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ product.name }}</h1>
+            <p class="text-muted">{% if product.roof_type %}{{ product.roof_type.name }}{% endif %}</p>
+            <h3 class="text-primary">KES {{ product.price }}</h3>
+            <p class="lead">{{ product.description }}</p>
+
+            <div class="row g-3 mb-3">
+                <div class="col-6"><strong>Gauge:</strong> {{ product.gauge|default:'-' }}</div>
+                <div class="col-6"><strong>Warranty:</strong> {{ product.warranty|default:'-' }}</div>
+            </div>
+
+            <h5 class="mt-3">Features</h5>
+            <ul>
+                {% if product.features %}
+                    {% for feat in product.features %}
+                        <li>{{ feat }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>No features listed.</li>
+                {% endif %}
+            </ul>
+
+            <div class="d-flex gap-3 mt-4">
+                <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+</html>

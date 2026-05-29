@@ -1,0 +1,1429 @@
+﻿{% extends "base.html" %}
+{% load static %}
+{% block title %}MabatiHubKenya | Roofing Products{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/products.css' %}">
+{% endblock %}
+{% block content %}
+
+<header class="hero-products text-white d-flex align-items-center">
+    <div class="overlay"></div>
+    <div class="container position-relative hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <span class="badge bg-light text-dark rounded-pill mb-3">Premium Roofing Solutions</span>
+                <h1 class="display-4 fw-bold mb-4">Premium Roofing Solutions</h1>
+                <p class="lead mb-4">Explore modern mabati profiles, finishes, gauges and colors for every type of home.</p>
+                <div class="d-flex flex-column flex-sm-row gap-3">
+                    <a href="#roofing-categories" class="btn btn-light btn-lg">Browse Categories</a>
+                    <a href="{% url 'visualizer' %}" class="btn btn-outline-light btn-lg">Open Visualizer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section id="roofing-categories" class="py-5 category-overview">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <p class="text-uppercase text-primary fw-semibold mb-2">Roofing categories</p>
+            <h2 class="fw-bold">Explore every premium mabati profile</h2>
+            <p class="text-muted mx-auto mt-3" style="max-width: 720px;">From residential classics to industrial strength systems, each material is designed for durability, style and weather resistance.</p>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <form class="row g-2 align-items-end" method="get" action="{% url 'products' %}">
+                    <div class="col-md-4">
+                        <label class="form-label mb-1" for="search">Search products</label>
+                        <input id="search" name="q" type="search" class="form-control" placeholder="Search by name or description" value="{{ search_query|default:'' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1" for="roof_type">Roof type</label>
+                        <select id="roof_type" name="roof_type" class="form-select">
+                            <option value="">All roof types</option>
+                            {% for roof_type in roof_types %}
+                                <option value="{{ roof_type.slug }}" {% if roof_type.slug == active_roof_type %}selected{% endif %}>{{ roof_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1" for="color">Color</label>
+                        <select id="color" name="color" class="form-select">
+                            <option value="">All colors</option>
+                            {% for color in color_variants %}
+                                <option value="{{ color.slug }}" {% if color.slug == active_color %}selected{% endif %}>{{ color.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row g-4">
+        {% for product in products %}
+
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                
+                <div class="card category-card h-100 shadow-sm border-0">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% else %}
+                        <img src="{% static 'images/products/versatile/versatile-thumb.jpg' %}" class="card-img-top" alt="{{ product.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ product.name }}</h5>
+                        <p class="card-text text-muted mb-2">{{ product.description|truncatechars:100 }}</p>
+                        <ul class="list-unstyled small text-muted mb-3">
+                            <li><strong>Price:</strong> KES {{ product.price }}</li>
+                            <li><strong>Gauge:</strong> {{ product.gauge }}</li>
+                            <li><strong>Warranty:</strong> {{ product.warranty }}</li>
+                            <li><strong>Color:</strong>
+                                {% if product.color_variants.all %}
+                                    {% for color in product.color_variants.all %}
+                                        {{ color.name }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}-{% endif %}
+                            </li>
+                        </ul>
+                        <a href="{% url 'product_detail' product.slug %}" class="btn btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-5 product-showcases">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <p class="text-uppercase text-primary fw-semibold mb-2">Product showcase</p>
+            <h2 class="fw-bold">Roofing solutions crafted for modern architecture</h2>
+        </div>
+
+        {% for p in featured_products %}
+        <section id="product-{{ p.slug }}" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-{{ p.slug }}" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+                            {% if p.images.all %}
+                                {% for img in p.images.all %}
+                                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                        <img src="{{ img.image.url }}" class="d-block w-100" alt="{{ p.name }} image">
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="carousel-item active">
+                                    {% if p.image %}
+                                        <img src="{{ p.image.url }}" class="d-block w-100" alt="{{ p.name }} image">
+                                    {% else %}
+                                        <img src="{% static 'images/products/versatile/versatile-thumb.jpg' %}" class="d-block w-100" alt="{{ p.name }} image">
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-{{ p.slug }}" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-{{ p.slug }}" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+                        {% if p.color_variants.all %}
+                            {% for col in p.color_variants.all %}
+                                <div class="col-6 col-sm-4 col-lg-3">
+                                    <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                        <span class="color-pill" style="display:inline-block;width:18px;height:18px;border-radius:50%;background: {{ col.hex_code|default:"#ffffff" }};border:1px solid #ddd;margin-right:8px;padding:0"></span>
+                                        <p class="mb-0 fw-semibold">{{ col.name }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">{% if p.roof_type %}{{ p.roof_type.name }}{% else %}{{ p.name }}{% endif %}</span>
+                        <h2 class="fw-bold mb-3">{{ p.name }}</h2>
+                        <p class="text-muted lead mb-4">{{ p.description|truncatechars:160 }}</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">{{ p.gauge|default:'-' }}</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">{{ p.warranty|default:'-' }}</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Price</h6><p class="mb-0 fw-semibold">KES {{ p.price }}</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Details</h6><p class="mb-0 fw-semibold">{% if p.roof_type %}{{ p.roof_type.name }}{% else %}-{% endif %}</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose {{ p.name }}</h5>
+                        <ul class="mb-4 product-benefits">
+                            {% if p.features %}
+                                {% for feat in p.features %}
+                                    <li>{{ feat }}</li>
+                                {% endfor %}
+                            {% else %}
+                                <li>Reliable performance and value.</li>
+                            {% endif %}
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="{{ p.get_absolute_url }}">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endfor %}
+
+        <section id="product-roman-long-tile" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-roman-long-tile" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'images/products/roman-long-tile/front-01.jpg' %}" class="d-block w-100" alt="Roman Long Tile image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/roman-long-tile/roofline-01.jpg' %}" class="d-block w-100" alt="Roman Long Tile image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/roman-long-tile/detail-01.jpg' %}" class="d-block w-100" alt="Roman Long Tile image">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-roman-long-tile" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-roman-long-tile" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Tile Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Charcoal</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Forest Green</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Brick Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Blue</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Coffee Brown</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Black</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Burgundy</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">Roman Long Tile</span>
+                        <h2 class="fw-bold mb-3">Architectural curves for upscale roofs</h2>
+                        <p class="text-muted lead mb-4">A graceful long tile profile engineered to create bold, sculpted roof forms with refined rhythm and premium durability.</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">28, 30</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Finish Types</h6><p class="mb-0 fw-semibold">Matte, Gloss</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">25 year warranty</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Recommended Use</h6><p class="mb-0 fw-semibold">Luxury villas, Mediterranean estates, boutique lodges</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose Roman Long Tile</h5>
+                        <ul class="mb-4 product-benefits">
+
+                            <li>Elegant elongated tile pattern</li>
+
+                            <li>Strong wind uplift resistance</li>
+
+                            <li>Ideal for luxury design accents</li>
+
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-eurotile" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-eurotile" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'images/products/eurotile/front-01.jpg' %}" class="d-block w-100" alt="Eurotile image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/eurotile/texture-01.jpg' %}" class="d-block w-100" alt="Eurotile image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/eurotile/closeup-01.jpg' %}" class="d-block w-100" alt="Eurotile image">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-eurotile" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-eurotile" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Tile Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Charcoal</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Forest Green</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Brick Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Blue</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Coffee Brown</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Black</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Burgundy</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">Eurotile</span>
+                        <h2 class="fw-bold mb-3">Contemporary tile roofing with refined finishes</h2>
+                        <p class="text-muted lead mb-4">A European-inspired profile with sleek lines and engineered profile depth for strong weather performance and minimal maintenance.</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">28, 30</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Finish Types</h6><p class="mb-0 fw-semibold">Matte, Gloss</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">25 year warranty</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Recommended Use</h6><p class="mb-0 fw-semibold">Contemporary homes, apartments, commercial façades</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose Eurotile</h5>
+                        <ul class="mb-4 product-benefits">
+
+                            <li>Modern tile appearance</li>
+
+                            <li>Durable corrosion coating</li>
+
+                            <li>Streamlined roof installation</li>
+
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-orientile" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-orientile" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'images/products/orientile/front-01.jpg' %}" class="d-block w-100" alt="Orientile image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/orientile/roof-view-01.jpg' %}" class="d-block w-100" alt="Orientile image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/orientile/detail-01.jpg' %}" class="d-block w-100" alt="Orientile image">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-orientile" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-orientile" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Tile Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Charcoal</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Forest Green</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Brick Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Blue</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Coffee Brown</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Black</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Burgundy</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">Orientile</span>
+                        <h2 class="fw-bold mb-3">Modern roof architecture with sculptural flair</h2>
+                        <p class="text-muted lead mb-4">A refined profile built to complement contemporary architecture while delivering reliable protection across diverse climates.</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">28, 30</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Finish Types</h6><p class="mb-0 fw-semibold">Matte, Gloss</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">25 year warranty</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Recommended Use</h6><p class="mb-0 fw-semibold">Modern houses, offices, retail spaces</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose Orientile</h5>
+                        <ul class="mb-4 product-benefits">
+
+                            <li>Sculpted tile design</li>
+
+                            <li>Excellent rain shedding</li>
+
+                            <li>Premium finish retention</li>
+
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-resincot" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-resincot" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'images/products/resincot/front-01.jpg' %}" class="d-block w-100" alt="Resincot image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/resincot/texture-01.jpg' %}" class="d-block w-100" alt="Resincot image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/resincot/closeup-01.jpg' %}" class="d-block w-100" alt="Resincot image">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-resincot" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-resincot" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Tile Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Charcoal</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Forest Green</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Brick Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Blue</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Coffee Brown</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Black</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Burgundy</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">Resincot</span>
+                        <h2 class="fw-bold mb-3">Premium matte surface for commercial roofs</h2>
+                        <p class="text-muted lead mb-4">Designed to deliver uniform matte coverage, Resincot is ideal for modern offices, hospitality roofs and projects requiring discrete architectural appeal.</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">28, 30</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Finish Types</h6><p class="mb-0 fw-semibold">Matte</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">25 year warranty</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Recommended Use</h6><p class="mb-0 fw-semibold">Commercial, offices, lifestyle centers</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose Resincot</h5>
+                        <ul class="mb-4 product-benefits">
+
+                            <li>Low glare, modern aesthetic</li>
+
+                            <li>High scratch resistance</li>
+
+                            <li>Uniform color retention</li>
+
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-it5" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-it5" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'images/products/it5/front-01.jpg' %}" class="d-block w-100" alt="IT5 image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/it5/side-01.jpg' %}" class="d-block w-100" alt="IT5 image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/it5/detail-01.jpg' %}" class="d-block w-100" alt="IT5 image">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-it5" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-it5" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Tile Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Charcoal</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Forest Green</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Brick Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Blue</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Coffee Brown</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Black</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Burgundy</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">IT5</span>
+                        <h2 class="fw-bold mb-3">High-performance panels built for precision</h2>
+                        <p class="text-muted lead mb-4">An advanced profile engineered for strong span capacity and premium finish retention. Built for roofs where strength and details matter.</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">28, 30</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Finish Types</h6><p class="mb-0 fw-semibold">Matte, Gloss</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">25 year warranty</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Recommended Use</h6><p class="mb-0 fw-semibold">Commercial, residential and architectural icons</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose IT5</h5>
+                        <ul class="mb-4 product-benefits">
+
+                            <li>Precision engineering</li>
+
+                            <li>Excellent water resistance</li>
+
+                            <li>Fast installation with integrated ribs</li>
+
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-standing-seam" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-standing-seam" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'images/products/standing-seam/front-01.jpg' %}" class="d-block w-100" alt="Standing Seam image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/standing-seam/roofline-01.jpg' %}" class="d-block w-100" alt="Standing Seam image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/standing-seam/detail-01.jpg' %}" class="d-block w-100" alt="Standing Seam image">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-standing-seam" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-standing-seam" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Tile Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Charcoal</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Forest Green</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Brick Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Blue</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Coffee Brown</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Black</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Burgundy</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">Standing Seam</span>
+                        <h2 class="fw-bold mb-3">Clean, concealed panels for premium architecture</h2>
+                        <p class="text-muted lead mb-4">A modern concealed-fastener system with crisp vertical ribs and a sleek finish. Ideal for high-end architectural roofs and commercial façades.</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">28, 30</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Finish Types</h6><p class="mb-0 fw-semibold">Matte, Gloss</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">30 year warranty</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Recommended Use</h6><p class="mb-0 fw-semibold">Architectural homes, retail, offices</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose Standing Seam</h5>
+                        <ul class="mb-4 product-benefits">
+
+                            <li>Hidden fasteners</li>
+
+                            <li>Minimal roof maintenance</li>
+
+                            <li>Contemporary premium look</li>
+
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-industrial-roofing" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-industrial-roofing" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'images/products/industrial/front-01.jpg' %}" class="d-block w-100" alt="Industrial Roofing image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/industrial/side-01.jpg' %}" class="d-block w-100" alt="Industrial Roofing image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/industrial/detail-01.jpg' %}" class="d-block w-100" alt="Industrial Roofing image">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-industrial-roofing" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-industrial-roofing" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Tile Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Charcoal</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Forest Green</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Brick Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Blue</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Coffee Brown</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Black</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Burgundy</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">Industrial Roofing</span>
+                        <h2 class="fw-bold mb-3">Heavy-duty coverage for large-scale facilities</h2>
+                        <p class="text-muted lead mb-4">Built for factories, warehouses and commercial sheds, this profile is engineered for maximum strength, corrosion protection and long service life.</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">28, 30</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Finish Types</h6><p class="mb-0 fw-semibold">Matte, Gloss</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">20 year industrial warranty</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Recommended Use</h6><p class="mb-0 fw-semibold">Industrial, warehousing, logistics</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose Industrial Roofing</h5>
+                        <ul class="mb-4 product-benefits">
+
+                            <li>High-span performance</li>
+
+                            <li>Superior weather resilience</li>
+
+                            <li>Easy roof system maintenance</li>
+
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-flashings" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-flashings" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'images/products/flashings/front-01.jpg' %}" class="d-block w-100" alt="Flashings image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/flashings/detail-01.jpg' %}" class="d-block w-100" alt="Flashings image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/flashings/installation-01.jpg' %}" class="d-block w-100" alt="Flashings image">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-flashings" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-flashings" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Tile Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Charcoal</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Forest Green</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Brick Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Blue</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Coffee Brown</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Black</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Burgundy</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">Flashings</span>
+                        <h2 class="fw-bold mb-3">Precision metalwork for secure roof transitions</h2>
+                        <p class="text-muted lead mb-4">Durable flashings and trims engineered to protect ridges, gutters, and wall junctions with tight weatherproof seals.</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">Custom gauges</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Finish Types</h6><p class="mb-0 fw-semibold">Matte, Gloss</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">10 year system warranty</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Recommended Use</h6><p class="mb-0 fw-semibold">All roofing systems</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose Flashings</h5>
+                        <ul class="mb-4 product-benefits">
+
+                            <li>Perfect roof integration</li>
+
+                            <li>Superior leak prevention</li>
+
+                            <li>Designer edge details</li>
+
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-gutters" class="product-section py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <div id="carousel-product-gutters" class="carousel slide product-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'images/products/gutters/front-01.jpg' %}" class="d-block w-100" alt="Gutters image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/gutters/system-01.jpg' %}" class="d-block w-100" alt="Gutters image">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{% static 'images/products/gutters/detail-01.jpg' %}" class="d-block w-100" alt="Gutters image">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-gutters" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-gutters" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="row gx-3 gy-3 mt-4 color-variant-row">
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Tile Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Charcoal</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Forest Green</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Brick Red</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Blue</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Coffee Brown</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Black</p>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="color-variant-card p-3 rounded-4 shadow-sm">
+                                <span class="color-pill"></span>
+                                <p class="mb-0 fw-semibold">Burgundy</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-copy">
+                        <span class="badge bg-primary rounded-pill mb-3">Gutters</span>
+                        <h2 class="fw-bold mb-3">Complete drainage systems engineered for longevity</h2>
+                        <p class="text-muted lead mb-4">From gutters to downpipes, these systems are designed to move rainwater safely and enhance your roof installation with a refined finish.</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">Custom gauges</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Finish Types</h6><p class="mb-0 fw-semibold">Matte, Gloss</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">15 year drainage warranty</p></div></div>
+                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Recommended Use</h6><p class="mb-0 fw-semibold">All roof installations</p></div></div>
+                        </div>
+                        <h5 class="fw-semibold mb-3">Why customers choose Gutters</h5>
+                        <ul class="mb-4 product-benefits">
+
+                            <li>Optimized water flow</li>
+
+                            <li>Durable construction</li>
+
+                            <li>Minimal maintenance required</li>
+
+                        </ul>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-outline-secondary btn-lg" href="#quote-banner">Request Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="info-card rounded-4 shadow-sm p-4 h-100">
+                        <span class="badge bg-secondary mb-3">Gauge Differences</span>
+                        <h4 class="fw-bold mb-3">Gauge 28 vs 30</h4>
+                        <p class="text-muted mb-3">Choose the right thickness for your budget and performance needs.</p>
+                        <ul class="mb-0">
+                            <li><strong>Gauge 28:</strong> thicker, stronger, more durable, premium quality.</li>
+                            <li><strong>Gauge 30:</strong> lighter, more affordable, ideal for standard residential roofs.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="info-card rounded-4 shadow-sm p-4 h-100">
+                        <span class="badge bg-secondary mb-3">Matte Finish</span>
+                        <h4 class="fw-bold mb-3">Modern premium appearance</h4>
+                        <p class="text-muted mb-3">Matte finishes offer a grounded aesthetic with subtle texture.</p>
+                        <ul class="mb-0">
+                            <li>Less reflective in bright sunlight</li>
+                            <li>Hides scratches and marks better</li>
+                            <li>Elegant, understated architectural tone</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="info-card rounded-4 shadow-sm p-4 h-100">
+                        <span class="badge bg-secondary mb-3">Gloss Finish</span>
+                        <h4 class="fw-bold mb-3">Reflective vibrant look</h4>
+                        <p class="text-muted mb-3">Gloss finishes create a polished, classic mabati statement.</p>
+                        <ul class="mb-0">
+                            <li>Shiny reflective surface</li>
+                            <li>Classic mabati aesthetic</li>
+                            <li>Easy to wipe clean and maintain</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5 product-comparison">
+            <div class="section-header text-center mb-5">
+                <p class="text-uppercase text-primary fw-semibold mb-2">Compare roofing options</p>
+                <h2 class="fw-bold">Select the best profile for your project</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-xl-3">
+                    <div class="comparison-card rounded-4 shadow-sm p-4 h-100">
+                        <span class="comparison-title">Box Profile</span>
+                        <p class="mb-3 text-muted">Reliable all-round performer for modern homes and commercial spaces.</p>
+                        <ul>
+                            <li>Strong water shedding</li>
+                            <li>Low maintenance</li>
+                            <li>Cost-effective</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="comparison-card rounded-4 shadow-sm p-4 h-100">
+                        <span class="comparison-title">Versatile</span>
+                        <p class="mb-3 text-muted">Blends architectural style with premium durability.</p>
+                        <ul>
+                            <li>Luxury tile appearance</li>
+                            <li>High-end finishes</li>
+                            <li>Elegant roof lines</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="comparison-card rounded-4 shadow-sm p-4 h-100">
+                        <span class="comparison-title">Standing Seam</span>
+                        <p class="mb-3 text-muted">Top-tier concealed fastener system for premium architecture.</p>
+                        <ul>
+                            <li>Sleek vertical profile</li>
+                            <li>Low upkeep</li>
+                            <li>High wind resistance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="comparison-card rounded-4 shadow-sm p-4 h-100">
+                        <span class="comparison-title">Industrial Roofing</span>
+                        <p class="mb-3 text-muted">Heavy-duty coverage for factories, warehousing and infrastructure.</p>
+                        <ul>
+                            <li>Maximum span support</li>
+                            <li>Superior corrosion protection</li>
+                            <li>Built for volume installation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5 recommendation-section">
+            <div class="section-header text-center mb-5">
+                <p class="text-uppercase text-primary fw-semibold mb-2">Roofing recommendations</p>
+                <h2 class="fw-bold">Recommended solutions based on your project type</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="recommend-card rounded-4 shadow-sm p-4 h-100">
+                        <h5 class="fw-bold">Luxury residential</h5>
+                        <p class="text-muted">Stone Coated, Versatile and Roman Long Tile provide elegant appeal and premium protection.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="recommend-card rounded-4 shadow-sm p-4 h-100">
+                        <h5 class="fw-bold">Modern urban homes</h5>
+                        <p class="text-muted">Standing Seam, IT5 and Orientile create clean lines with architectural sophistication.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="recommend-card rounded-4 shadow-sm p-4 h-100">
+                        <h5 class="fw-bold">Commercial & industrial</h5>
+                        <p class="text-muted">Corrugated and Industrial Roofing deliver strong coverage with efficient installation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5 faq-section">
+            <div class="section-header text-center mb-5">
+                <p class="text-uppercase text-primary fw-semibold mb-2">Frequently asked questions</p>
+                <h2 class="fw-bold">Answers for confident roofing decisions</h2>
+            </div>
+            <div class="accordion" id="productsFaq">
+                <div class="accordion-item rounded-4 shadow-sm mb-3">
+                    <h2 class="accordion-header" id="faqOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            What is the difference between matte and gloss finishes?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="faqOne" data-bs-parent="#productsFaq">
+                        <div class="accordion-body text-muted">
+                            Matte finishes are softer, less reflective and better at hiding scuffs. Gloss finishes offer a polished look with vibrant reflections that accent the roof’s color.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item rounded-4 shadow-sm mb-3">
+                    <h2 class="accordion-header" id="faqTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Which roofing profiles work best for modern homes?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="faqTwo" data-bs-parent="#productsFaq">
+                        <div class="accordion-body text-muted">
+                            Modern homes benefit from Standing Seam, IT5, Orientile and Versatile profiles because they offer clean lines, architectural detail and premium finishes.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item rounded-4 shadow-sm mb-3">
+                    <h2 class="accordion-header" id="faqThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Can I use the visualizer before choosing a product?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="faqThree" data-bs-parent="#productsFaq">
+                        <div class="accordion-body text-muted">
+                            Yes — the Visualizer is designed to help you preview color, profile and view combinations before finalizing your roofing choice.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quote-banner" class="quote-banner rounded-5 p-5 text-white text-center position-relative overflow-hidden">
+            <div class="overlay"></div>
+            <div class="position-relative">
+                <h2 class="display-6 fw-bold mb-3">Ready to elevate your roof?</h2>
+                <p class="lead mb-4">Request a personalized proposal for your project and discover the perfect mabati solution.</p>
+                <a href="{% url 'contact' %}" class="btn btn-primary btn-lg me-3">Request Quote</a>
+                <a href="{% url 'visualizer' %}" class="btn btn-outline-light btn-lg">Launch Visualizer</a>
+            </div>
+        </section>
+    </div>
+</section>
+
+<a id="stickyQuote" class="sticky-quote btn btn-primary btn-lg shadow-lg" href="{% url 'contact' %}">
+    <i class="fa-solid fa-envelope me-2"></i> Request Quote
+</a>
+
+{% block extra_js %}
+<script src="{% static 'js/products.js' %}"></script>
+{% endblock %}
+{% endblock %}

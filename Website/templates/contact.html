@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Contact — MabatiHubKenya{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about_contact.css' %}">
+{% endblock %}
+{% block content %}
+
+<header class="ac-hero text-white d-flex align-items-center" style="min-height:320px;">
+  <div class="overlay"></div>
+  <div class="container py-5">
+    <div class="row">
+      <div class="col-lg-8">
+        <h1 class="fw-bold">Get in touch</h1>
+        <p class="text-muted">Request a quote, schedule a consultation, or ask about our warranties and delivery options.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end d-none d-lg-block">
+        <a href="#contact-form" class="btn btn-light btn-lg">Request Quote</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container my-5">
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card p-4 shadow-sm">
+        <h5 class="fw-bold">Contact Information</h5>
+        <p class="text-muted mb-1">Phone: <a href="tel:+254700000000">+254 700 000 000</a></p>
+        <p class="text-muted mb-1">Email: <a href="mailto:info@mabatihubkenya.co.ke">info@mabatihubkenya.co.ke</a></p>
+        <p class="text-muted mb-0">Address: Industrial Park, Nairobi, Kenya</p>
+        <hr>
+        <h6 class="fw-semibold">Office Hours</h6>
+        <p class="text-muted mb-0">Mon–Fri 08:00–17:00</p>
+      </div>
+
+      <div class="card p-4 mt-4 shadow-sm">
+        <h6 class="fw-bold">Request a site visit</h6>
+        <p class="text-muted">We schedule free site assessments for accurate quotations.</p>
+        <a href="#contact-form" class="btn btn-primary">Book Visit</a>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div id="contact-form" class="card p-4 shadow-sm">
+        <h5 class="fw-bold mb-3">Send us a message</h5>
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="mb-3">
+            <label class="form-label" for="id_name">Name</label>
+            {{ form.name }}
+            {{ form.name.errors }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="id_email">Email</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="id_phone">Phone (optional)</label>
+            {{ form.phone }}
+            {{ form.phone.errors }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="id_message">Message</label>
+            {{ form.message }}
+            {{ form.message.errors }}
+          </div>
+          <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-primary">Send Message</button>
+            <button type="reset" class="btn btn-outline-secondary">Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card mt-4 p-0 overflow-hidden shadow-sm">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!" width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
