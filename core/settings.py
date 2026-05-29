@@ -81,7 +81,7 @@ AWS_STORAGE_BUCKET_NAME = "product.images"
 
 AWS_S3_ENDPOINT_URL = "https://juhkarrjmlwjwjtbysnn.storage.supabase.co/storage/v1/s3"
 
-AWS_S3_REGION_NAME = "us-east-1"
+AWS_S3_REGION_NAME = "eu-west-1"
 
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
