@@ -4,6 +4,9 @@ from django.urls import reverse
 from core.supa_storage import upload_image
 
 
+# =========================
+# PRODUCT TYPE
+# =========================
 class ProductType(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
@@ -21,6 +24,9 @@ class ProductType(models.Model):
         super().save(*args, **kwargs)
 
 
+# =========================
+# COLOR VARIANT
+# =========================
 class ColorVariant(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
@@ -39,6 +45,9 @@ class ColorVariant(models.Model):
         super().save(*args, **kwargs)
 
 
+# =========================
+# PRODUCT
+# =========================
 class Product(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
@@ -78,7 +87,9 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        # STEP 1: slug generation
+        # -------------------------
+        # SLUG GENERATION
+        # -------------------------
         if not self.slug:
             base = slugify(self.name)
             slug = base
@@ -90,18 +101,26 @@ class Product(models.Model):
 
             self.slug = slug
 
-        # STEP 2: save product first
+        # -------------------------
+        # SAVE FIRST
+        # -------------------------
         super().save(*args, **kwargs)
 
-        # STEP 3: upload image to Supabase
+        # -------------------------
+        # UPLOAD TO SUPABASE S3
+        # -------------------------
         if self.image and not self.image_url:
-            with self.image.open("rb") as f:
-                url = upload_image(f, self.image.name)
+            try:
+                self.image.file.seek(0)
 
-            self.image_url = url
+                url = upload_image(self.image.file, self.image.name)
 
-            # update only image_url (prevents recursion issues)
-            Product.objects.filter(pk=self.pk).update(image_url=url)
+                Product.objects.filter(pk=self.pk).update(
+                    image_url=url
+                )
+
+            except Exception as e:
+                print("IMAGE UPLOAD ERROR:", e)
 
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
@@ -111,13 +130,16 @@ class Product(models.Model):
         if self.image_url:
             return self.image_url
 
-        first = self.images.first() if hasattr(self, 'images') else None
+        first = self.images.first()
         if first and first.image:
             return first.image.url
 
         return ''
 
 
+# =========================
+# PRODUCT IMAGES
+# =========================
 class ProductImage(models.Model):
     VIEW_CHOICES = [
         ('front', 'Front'),
@@ -144,6 +166,9 @@ class ProductImage(models.Model):
         return f"{self.product.name} - {self.view_type}"
 
 
+# =========================
+# CONTACT MESSAGE
+# =========================
 class ContactMessage(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField()
@@ -159,6 +184,9 @@ class ContactMessage(models.Model):
         return f"{self.name} <{self.email}>"
 
 
+# =========================
+# GALLERY IMAGE
+# =========================
 class GalleryImage(models.Model):
     image = models.ImageField(upload_to='gallery/')
     title = models.CharField(max_length=200, blank=True)
@@ -167,7 +195,7 @@ class GalleryImage(models.Model):
     order = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
-        ordering = ['-uploaded_at', 'order']
+        ordering = ['order', '-uploaded_at']
 
     def __str__(self):
-        return self.title or self.image.name.split('/')[-1]
+        return self.title or f"Gallery {self.id}"
