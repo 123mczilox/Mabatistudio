@@ -56,7 +56,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
-    'default': dj_database_url.parse(os.environ.get('DATABASE_URL',))
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
 }
 
 STATIC_URL = '/static/'
