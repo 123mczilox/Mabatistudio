@@ -11,6 +11,7 @@ class ProductType(models.Model):
     class Meta:
         verbose_name = 'Product Type'
         verbose_name_plural = 'Product Types'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -29,6 +30,7 @@ class ColorVariant(models.Model):
     class Meta:
         verbose_name = 'Color Variant'
         verbose_name_plural = 'Color Variants'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -90,18 +92,21 @@ class Product(models.Model):
 
             self.slug = slug
 
-        # STEP 2: save product first
+        # STEP 2: save first (important)
         super().save(*args, **kwargs)
 
-        # STEP 3: upload image to Supabase
+        # STEP 3: upload to Supabase safely
         if self.image and not self.image_url:
-            with self.image.open("rb") as f:
-                url = upload_image(f, self.image.name)
+            try:
+                with self.image.open("rb") as f:
+                    url = upload_image(f, self.image.name)
 
-            self.image_url = url
+                if url:
+                    self.image_url = url
+                    Product.objects.filter(pk=self.pk).update(image_url=url)
 
-            # update only image_url (prevents recursion issues)
-            Product.objects.filter(pk=self.pk).update(image_url=url)
+            except Exception as e:
+                print("Image upload failed:", e)
 
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
