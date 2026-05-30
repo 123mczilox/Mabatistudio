@@ -8,10 +8,10 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 def upload_image(file, filename):
-    response = supabase.storage.from_("product.images").upload(
+    response = supabase.storage.from_("product-images").upload(
         filename,
         file
     )
 
-    public_url = supabase.storage.from_("product.images").get_public_url(filename)
+    public_url = supabase.storage.from_("product-images").get_public_url(filename)
     return public_url

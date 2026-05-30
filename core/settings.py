@@ -5,7 +5,7 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-^to=+eufdcd1a+i=1do-86_-u!@&0o6mm2v5*czib-3o7jpvzu'
-DEBUG = True
+DEBUG = False # Set to False for production, True for development
 
 ALLOWED_HOSTS = [
     'mabati-hub-kenya.onrender.com',
@@ -77,7 +77,7 @@ DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-AWS_STORAGE_BUCKET_NAME = "product.images"
+AWS_STORAGE_BUCKET_NAME = "product-images"
 
 AWS_S3_ENDPOINT_URL = "https://juhkarrjmlwjwjtbysnn.storage.supabase.co/storage/v1/s3"
 
