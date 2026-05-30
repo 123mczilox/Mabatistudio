@@ -16,7 +16,7 @@
 
             <div class="mt-3 d-flex gap-2 align-items-center">
                 {% for img in product.images.all %}
-                    <img src="{{ img.image.url }}" alt="{{ img.alt_text }}" style="height:60px; width:auto;" class="rounded border">
+                    <img src="{{ img.image_url }}" alt="{{ img.alt_text }}" style="height:60px; width:auto;" class="rounded border">
                 {% empty %}
                     <!-- no gallery images -->
                 {% endfor %}
