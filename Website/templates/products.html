@@ -69,8 +69,8 @@
             <div class="col-md-6 col-lg-4 col-xl-3">
                 
                 <div class="card category-card h-100 shadow-sm border-0">
-                    {% if product.image %}
-                        <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% if product.main_image_url %}
+                        <img src="{{ product.main_image_url }}" class="card-img-top" alt="{{ product.name }}">
                     {% else %}
                         <img src="{% static 'images/products/versatile/versatile-thumb.jpg' %}" class="card-img-top" alt="{{ product.name }}">
                     {% endif %}
@@ -119,8 +119,8 @@
                                 {% endfor %}
                             {% else %}
                                 <div class="carousel-item active">
-                                    {% if p.image %}
-                                        <img src="{{ p.image_url }}" class="d-block w-100" alt="{{ p.name }} image">
+                                    {% if p.main_image_url %}
+                                        <img src="{{ p.main_image_url }}" class="d-block w-100" alt="{{ p.name }} image">
                                     {% else %}
                                         <img src="{% static 'images/products/versatile/versatile-thumb.jpg' %}" class="d-block w-100" alt="{{ p.name }} image">
                                     {% endif %}

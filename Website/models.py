@@ -145,6 +145,12 @@ class ProductImage(models.Model):
     class Meta:
         ordering = ['order']
 
+    @property
+    def image_url(self):
+        if self.image:
+            return self.image.url
+        return ''
+
     def __str__(self):
         return f"{self.product.name} - {self.view_type}"
 
