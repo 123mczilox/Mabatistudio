@@ -113,12 +113,14 @@ class Product(models.Model):
 
     @property
     def main_image_url(self):
+        from core.supa_storage import get_public_url
+        
         if self.image_url:
             return self.image_url
 
         first = self.images.first() if hasattr(self, 'images') else None
         if first and first.image:
-            return first.image.url
+            return get_public_url(str(first.image))
 
         return ''
 
@@ -148,7 +150,8 @@ class ProductImage(models.Model):
     @property
     def image_url(self):
         if self.image:
-            return self.image.url
+            from core.supa_storage import get_public_url
+            return get_public_url(str(self.image))
         return ''
 
     def __str__(self):
@@ -179,6 +182,13 @@ class GalleryImage(models.Model):
 
     class Meta:
         ordering = ['order', '-uploaded_at']
+
+    @property
+    def image_url(self):
+        if self.image:
+            from core.supa_storage import get_public_url
+            return get_public_url(str(self.image))
+        return ''
 
     def __str__(self):
         return self.title or str(self.image.name)

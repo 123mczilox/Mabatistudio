@@ -30,8 +30,8 @@
     {% if page_obj.object_list %}
       {% for img in page_obj.object_list %}
       <div class="gallery-item">
-        <a href="{{ img.image.url }}" class="glightbox" data-gallery="gallery" data-title="{{ img.title|escapejs }}" data-description="{{ img.caption|escapejs }}">
-          <img loading="lazy" src="{{ img.image.url }}" alt="{{ img.title }}">
+        <a href="{{ img.image_url }}" class="glightbox" data-gallery="gallery" data-title="{{ img.title|escapejs }}" data-description="{{ img.caption|escapejs }}">
+          <img loading="lazy" src="{{ img.image_url }}" alt="{{ img.title }}">
         </a>
         {% if img.title or img.caption %}
           <div class="gallery-caption">{{ img.title }}</div>

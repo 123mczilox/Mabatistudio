@@ -6,6 +6,24 @@ SUPABASE_URL = "https://juhkarrjmlwjwjtbysnn.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1aGthcnJqbWx3andqdGJ5c25uIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTk3MDU5OCwiZXhwIjoyMDk1NTQ2NTk4fQ.xpcHuc1Qojq308mOaiGEj6nM8CwviTvN2OMVO5hYAzM"
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+BUCKET_NAME = "product-images"
+SUPABASE_PUBLIC_URL = f"{SUPABASE_URL}/storage/v1/object/public/{BUCKET_NAME}"
+
+
+def get_public_url(filepath):
+    """Convert any file path to a valid Supabase public URL."""
+    if not filepath:
+        return ''
+    
+    # Normalize path
+    filepath = filepath.replace("\\", "/").lstrip("/")
+    
+    # If already a full URL, return as-is
+    if filepath.startswith("http"):
+        return filepath
+    
+    return f"{SUPABASE_PUBLIC_URL}/{filepath}"
+
 
 def upload_image(file, filename):
     try:
