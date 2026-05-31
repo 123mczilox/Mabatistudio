@@ -9,10 +9,18 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def upload_image(file, filename):
     try:
+        filename = filename.replace("\\", "/")
+
         response = supabase.storage.from_("product-images").upload(
             filename,
             file
         )
+
+        if not response or not getattr(response, "full_path", None):
+            raise RuntimeError("Supabase upload failed or returned no path")
+
+        if not supabase.storage.from_("product-images").exists(filename):
+            raise RuntimeError(f"Uploaded file not found in bucket: {filename}")
 
         public_url = supabase.storage.from_("product-images").get_public_url(filename)
         return public_url
