@@ -36,42 +36,35 @@
 </nav>
 
 {% block content %}{% endblock %}
-
-<footer class="bg-dark text-white py-5 mt-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <h5 class="mb-3">MabatiHubKenya</h5>
-                <p class="text-muted">Quality roofing materials and professional installation support. 50-year warranty on all products.</p>
-            </div>
-            <div class="col-md-4">
-                <h5 class="mb-3">Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="{% url 'home' %}" class="text-muted text-decoration-none">Home</a></li>
-                    <li><a href="{% url 'products' %}" class="text-muted text-decoration-none">Products</a></li>
-                    <li><a href="{% url 'roof_calculator' %}" class="text-muted text-decoration-none">Estimate Calculator</a></li>
-                    <li><a href="{% url 'contact' %}" class="text-muted text-decoration-none">Contact</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h5 class="mb-3">Support</h5>
-                <ul class="list-unstyled">
-                    <li><a href="tel:0792017423" class="text-muted text-decoration-none"><i class="fa-solid fa-phone"></i> 0792017423</a></li>
-                    <li><a href="https://wa.me/254700000000" class="text-muted text-decoration-none"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
-                    <li><a href="{% url 'admin:index' %}" class="text-muted text-decoration-none">Admin Dashboard</a></li>
-                </ul>
-            </div>
-        </div>
-        <hr class="bg-secondary">
-        <div class="row">
-            <div class="col-md-6">
-                <p class="text-muted mb-0">&copy; 2026 MabatiHubKenya. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <p class="text-muted mb-0">Built for contractors and builders.</p>
-            </div>
-        </div>
+<footer class="bg-danger text-white py-5 mt-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3">MabatiHubKenya</h5>
+        <p class="text-muted">Providing durable, weather-resistant roofing solutions across Kenya with top-tier materials and expert craftsmanship.</p>
+      </div>
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3">Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-muted text-decoration-none">Our Services</a></li>
+          <li><a href="#" class="text-muted text-decoration-none">Roofing Profiles</a></li>
+          <li><a href="#" class="text-muted text-decoration-none">Estimate Tool</a></li>
+          <li><a href="#" class="text-muted text-decoration-none">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3">Contact Info</h5>
+        <p class="text-muted mb-1"><i class="fa-solid fa-location-dot me-2"></i>Nairobi, Kenya</p>
+        <p class="text-muted mb-1"><i class="fa-solid fa-phone me-2"></i>0792017423</p>
+        <p class="text-muted"><i class="fa-solid fa-envelope me-2"></i>info@mabatihubkenya.co.ke</p>
+      </div>
     </div>
+    <hr class="text-muted my-4">
+    <div class="text-center text-muted">
+      <p class="mb-0">&copy; 2026 MabatiHubKenya. All Rights Reserved. <a href="{% url 'admin:index' %}" class="text-muted text-decoration-none">&middot; Staff Access</a></p>
+            
+    </div>
+  </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
