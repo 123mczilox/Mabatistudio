@@ -16,7 +16,7 @@
                 <p class="lead mb-4">Explore modern mabati profiles, finishes, gauges and colors for every type of home.</p>
                 <div class="d-flex flex-column flex-sm-row gap-3">
                     <a href="#roofing-categories" class="btn btn-light btn-lg">Browse Categories</a>
-                    <a href="{% url 'visualizer' %}" class="btn btn-outline-light btn-lg">Open Visualizer</a>
+                    <a href="{% url 'roof_calculator' %}" class="btn btn-outline-light btn-lg">Open Estimate</a>
                 </div>
             </div>
         </div>
@@ -171,7 +171,7 @@
                             {% endif %}
                         </ul>
                         <div class="d-flex flex-column flex-sm-row gap-3">
-                            <a class="btn btn-primary btn-lg" href="{% url 'visualizer' %}">Launch Visualizer</a>
+                            <a class="btn btn-primary btn-lg" href="{% url 'roof_calculator' %}">Calculate Estimate</a>
                             <a class="btn btn-outline-secondary btn-lg" href="{{ p.get_absolute_url }}">View Details</a>
                         </div>
                     </div>
@@ -343,7 +343,7 @@
                 <h2 class="display-6 fw-bold mb-3">Ready to elevate your roof?</h2>
                 <p class="lead mb-4">Request a personalized proposal for your project and discover the perfect mabati solution.</p>
                 <a href="{% url 'contact' %}" class="btn btn-primary btn-lg me-3">Request Quote</a>
-                <a href="{% url 'visualizer' %}" class="btn btn-outline-light btn-lg">Launch Visualizer</a>
+                <a href="{% url 'roof_calculator' %}" class="btn btn-outline-light btn-lg">Estimate Roof</a>
             </div>
         </section>
     </div>

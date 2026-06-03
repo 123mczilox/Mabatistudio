@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Q
-from .models import Product, ColorVariant, GalleryImage, ProductType, ProductType
+from .models import Product, ColorVariant, GalleryImage, ProductType
 from .forms import ContactForm
 from django.core.paginator import Paginator
 
@@ -42,21 +42,10 @@ def contact(request):
     return render(request, 'contact.html', {'current_page': 'contact', 'form': form})
 
 
-def visualizer(request):
-    product_types = ProductType.objects.order_by('name')
-    color_variants = ColorVariant.objects.order_by('name')
-    product_types_data = [{'slug': product_type.slug, 'name': product_type.name} for product_type in product_types]
-    color_variants_data = [
-        {'slug': color.slug, 'name': color.name, 'hex_code': color.hex_code or '#ccc'}
-        for color in color_variants
-    ]
-    return render(request, 'visualizer.html', {
-        'current_page': 'visualizer',
-        'product_types': product_types,
-        'color_variants': color_variants,
-        'product_types_data': product_types_data,
-        'color_variants_data': color_variants_data,
-    }) 
+def roof_calculator(request):
+    return render(request, 'roof_calculator.html', {
+        'current_page': 'roof_calculator',
+    })
 
 
 def about(request):

@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}MabatiHubKenya | Roof Estimate Calculator{% endblock %}
+{% block extra_css %}
+<style>
+.estimator-hero {
+    background: linear-gradient(135deg, rgba(139,0,0,0.95), rgba(47,47,47,0.95));
+}
+.estimator-hero .badge {
+    background: #ffd700;
+    color: #2f2f2f;
+}
+.estimator-card, .result-card {
+    border: 1px solid rgba(47,47,47,0.08);
+}
+.result-card { min-height: 310px; }
+.result-value {
+    font-size: 2rem;
+    font-weight: 700;
+}
+.result-label { letter-spacing: 0.04em; }
+.form-check-input:checked + label {
+    color: #8b0000;
+}
+@media (max-width: 767px) {
+    .estimator-hero .hero-copy { text-align: center; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<section class="estimator-hero text-white py-6">
+    <div class="container">
+        <div class="row align-items-center gy-4">
+            <div class="col-lg-7 hero-copy">
+                <span class="badge rounded-pill mb-3">Free Roof Estimate</span>
+                <h1 class="display-5 fw-bold mb-3">Calculate roof materials and costs in seconds.</h1>
+                <p class="lead text-white-75 mb-4">Enter your building dimensions, choose the roof type, profile, gauge and the system will estimate area, sheets, ridge caps, screws, nails, timber and total cost.</p>
+                <a href="#estimate-form" class="btn btn-outline-light btn-lg me-3">Start Estimate</a>
+                <a href="{% url 'contact' %}" class="btn btn-light btn-lg">Request Support</a>
+            </div>
+            <div class="col-lg-5">
+                <div class="card rounded-4 p-4 shadow-lg" style="background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.16);">
+                    <h5 class="text-white mb-3">Why use this estimator?</h5>
+                    <ul class="list-unstyled text-white-75 lh-lg">
+                        <li><i class="fa-solid fa-check text-warning me-2"></i>Fast roof area and material quantities.</li>
+                        <li><i class="fa-solid fa-check text-warning me-2"></i>Compare gauge and profile costs instantly.</li>
+                        <li><i class="fa-solid fa-check text-warning me-2"></i>Save a private estimate for later review.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="estimate-form" class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm estimator-card p-4">
+                    <h3 class="mb-4">Roof Estimate Inputs</h3>
+                    <form id="roofEstimateForm" class="row g-3">
+                        <div class="col-6">
+                            <label for="length" class="form-label">Building Length (m)</label>
+                            <input id="length" type="number" min="0" step="0.1" class="form-control" placeholder="50" value="50">
+                        </div>
+                        <div class="col-6">
+                            <label for="width" class="form-label">Building Width (m)</label>
+                            <input id="width" type="number" min="0" step="0.1" class="form-control" placeholder="100" value="100">
+                        </div>
+                        <div class="col-6">
+                            <label for="roofType" class="form-label">Roof Type</label>
+                            <select id="roofType" class="form-select">
+                                <option>Gable Roof</option>
+                                <option>Hip Roof</option>
+                                <option>Mono-Pitch Roof</option>
+                                <option>Flat Roof</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="pitch" class="form-label">Roof Pitch (°)</label>
+                            <select id="pitch" class="form-select">
+                                <option>15</option>
+                                <option>20</option>
+                                <option selected>25</option>
+                                <option>30</option>
+                                <option>35</option>
+                                <option>40</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="profile" class="form-label">Roofing Profile</label>
+                            <select id="profile" class="form-select">
+                                <option>Box Profile</option>
+                                <option>Corrugated Profile</option>
+                                <option>Tile Profile</option>
+                                <option>Versatile</option>
+                                <option>Roman Long Tile</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="gauge" class="form-label">Gauge</label>
+                            <select id="gauge" class="form-select">
+                                <option>Gauge 28</option>
+                                <option>Gauge 30</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="color" class="form-label">Color</label>
+                            <select id="color" class="form-select">
+                                <option>Charcoal Grey</option>
+                                <option>Maroon</option>
+                                <option>Brick Red</option>
+                                <option>Tile Red</option>
+                                <option>Forest Green</option>
+                                <option>Blue</option>
+                                <option>Coffee Brown</option>
+                                <option>White</option>
+                                <option>Silver</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="sheetPrice" class="form-label">Sheet Price (KES)</label>
+                            <input id="sheetPrice" type="number" min="0" step="1" class="form-control" value="1800">
+                        </div>
+                        <div class="col-6">
+                            <label for="ridgePrice" class="form-label">Ridge Cap Price (KES / 2m)</label>
+                            <input id="ridgePrice" type="number" min="0" step="1" class="form-control" value="800">
+                        </div>
+                        <div class="col-6">
+                            <label for="screwPrice" class="form-label">Screw Price (KES each)</label>
+                            <input id="screwPrice" type="number" min="0" step="0.1" class="form-control" value="5">
+                        </div>
+                        <div class="col-6">
+                            <label for="nailPrice" class="form-label">Nail Price (KES each)</label>
+                            <input id="nailPrice" type="number" min="0" step="0.1" class="form-control" value="3">
+                        </div>
+                        <div class="col-6">
+                            <label for="timberPrice" class="form-label">Timber Price (KES / m)</label>
+                            <input id="timberPrice" type="number" min="0" step="1" class="form-control" value="250">
+                        </div>
+                        <div class="col-6">
+                            <label for="labourCost" class="form-label">Labour Cost (KES)</label>
+                            <input id="labourCost" type="number" min="0" step="1" class="form-control" value="25000">
+                        </div>
+                        <div class="col-12">
+                            <label for="rainfall" class="form-label">Average Annual Rainfall (mm)</label>
+                            <input id="rainfall" type="number" min="0" step="1" class="form-control" value="1200">
+                        </div>
+                        <div class="col-12">
+                            <div class="row gx-2 gy-2">
+                                <div class="col-sm-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="includeScrews" checked>
+                                        <label class="form-check-label" for="includeScrews">Include Screws</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="includeNails" checked>
+                                        <label class="form-check-label" for="includeNails">Include Nails</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="includeTimber" checked>
+                                        <label class="form-check-label" for="includeTimber">Include Timber</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="includeRainwater" checked>
+                                        <label class="form-check-label" for="includeRainwater">Rainwater Harvesting</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="button" class="btn btn-primary btn-lg" onclick="updateEstimate()">Recalculate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="card shadow-sm result-card p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <p class="mb-1 text-uppercase text-secondary small">Roof Summary</p>
+                                    <h4 class="mb-0">Estimate at a glance</h4>
+                                </div>
+                                <span class="badge bg-warning text-dark">Instant</span>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="border rounded-3 p-3 h-100">
+                                        <p class="text-uppercase text-secondary mb-2 result-label">Roof Area</p>
+                                        <div class="result-value" id="roofArea">0 m²</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded-3 p-3 h-100">
+                                        <p class="text-uppercase text-secondary mb-2 result-label">Recommended Sheets</p>
+                                        <div class="result-value" id="recommendedSheets">0</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded-3 p-3 h-100">
+                                        <p class="text-uppercase text-secondary mb-2 result-label">Ridge Caps</p>
+                                        <div class="result-value" id="ridgeCaps">0</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded-3 p-3 h-100">
+                                        <p class="text-uppercase text-secondary mb-2 result-label">Water Harvesting</p>
+                                        <div class="result-value" id="rainwaterLitres">0 L</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card shadow-sm result-card p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <p class="mb-1 text-uppercase text-secondary small">Materials Required</p>
+                                    <h4 class="mb-0">What to buy</h4>
+                                </div>
+                                <span class="badge bg-secondary text-white">Estimate</span>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
+                                    Sheets required<div id="totalSheets">0</div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
+                                    Screws<div id="screwsRequired">0</div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
+                                    Nails<div id="nailsRequired">0</div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
+                                    Timber (m)<div id="timberLength">0</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card shadow-sm result-card p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <p class="mb-1 text-uppercase text-secondary small">Cost Breakdown</p>
+                                    <h4 class="mb-0">Estimated budget</h4>
+                                </div>
+                                <span class="badge bg-primary text-white">KES</span>
+                            </div>
+                            <div class="row gy-3">
+                                <div class="col-6">
+                                    <div class="border rounded-3 p-3">
+                                        <p class="mb-1 text-uppercase text-secondary small">Material Cost</p>
+                                        <div class="fw-semibold" id="materialCost">KES 0</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded-3 p-3">
+                                        <p class="mb-1 text-uppercase text-secondary small">Labour Cost</p>
+                                        <div class="fw-semibold" id="labourCostResult">KES 0</div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="border rounded-3 p-3 bg-light">
+                                        <p class="mb-1 text-uppercase text-secondary small">Grand Total</p>
+                                        <div class="fs-3 fw-bold" id="grandTotal">KES 0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 d-flex gap-3 flex-wrap">
+                                <button class="btn btn-outline-secondary btn-lg" disabled>Download Quotation</button>
+                                <a class="btn btn-primary btn-lg" href="{% url 'contact' %}">Request Official Quote</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script>
+const numberFormat = new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 });
+const formFields = [
+    'length', 'width', 'roofType', 'pitch', 'profile', 'gauge', 'color',
+    'sheetPrice', 'ridgePrice', 'screwPrice', 'nailPrice', 'timberPrice', 'labourCost', 'rainfall',
+    'includeScrews', 'includeNails', 'includeTimber', 'includeRainwater'
+];
+
+function getCoverWidth(profile) {
+    const widths = {
+        'Box Profile': 1.0,
+        'Corrugated Profile': 0.85,
+        'Tile Profile': 0.98,
+        'Versatile': 1.0,
+        'Roman Long Tile': 1.0,
+    };
+    return widths[profile] || 1.0;
+}
+
+function getTypeFactor(roofType) {
+    const factors = {
+        'Gable Roof': 1.00,
+        'Hip Roof': 1.06,
+        'Mono-Pitch Roof': 1.02,
+        'Flat Roof': 1.00,
+    };
+    return factors[roofType] || 1.0;
+}
+
+function getWastage(roofType) {
+    const complexTypes = ['Hip Roof', 'Mono-Pitch Roof'];
+    return complexTypes.includes(roofType) ? 0.10 : 0.05;
+}
+
+function getTimberFactor(roofType) {
+    const factors = {
+        'Gable Roof': 0.36,
+        'Hip Roof': 0.45,
+        'Mono-Pitch Roof': 0.32,
+        'Flat Roof': 0.28,
+    };
+    return factors[roofType] || 0.35;
+}
+
+function getRidgeLength(roofType, length, width) {
+    if (!length || !width) return 0;
+    if (roofType === 'Hip Roof') return Math.max(length, width) * 1.1;
+    if (roofType === 'Mono-Pitch Roof') return length;
+    if (roofType === 'Flat Roof') return 0;
+    return length;
+}
+
+function formatNumber(value) {
+    return Number(value).toLocaleString('en-KE', { maximumFractionDigits: 0 });
+}
+
+function updateEstimate() {
+    const length = Number(document.getElementById('length').value) || 0;
+    const width = Number(document.getElementById('width').value) || 0;
+    const pitch = Number(document.getElementById('pitch').value) || 0;
+    const roofType = document.getElementById('roofType').value;
+    const profile = document.getElementById('profile').value;
+    const sheetPrice = Number(document.getElementById('sheetPrice').value) || 0;
+    const ridgePrice = Number(document.getElementById('ridgePrice').value) || 0;
+    const screwPrice = Number(document.getElementById('screwPrice').value) || 0;
+    const nailPrice = Number(document.getElementById('nailPrice').value) || 0;
+    const timberPrice = Number(document.getElementById('timberPrice').value) || 0;
+    const labour = Number(document.getElementById('labourCost').value) || 0;
+    const rainfall = Number(document.getElementById('rainfall').value) || 0;
+    const includeScrews = document.getElementById('includeScrews').checked;
+    const includeNails = document.getElementById('includeNails').checked;
+    const includeTimber = document.getElementById('includeTimber').checked;
+    const includeRainwater = document.getElementById('includeRainwater').checked;
+
+    const footprint = length * width;
+    const slopeMultiplier = pitch > 0 ? 1 / Math.cos(pitch * Math.PI / 180) : 1;
+    const roofArea = footprint ? footprint * getTypeFactor(roofType) * slopeMultiplier : 0;
+    const coverWidth = getCoverWidth(profile);
+    const baseSheets = roofArea / coverWidth;
+    const wastage = getWastage(roofType);
+    const recommendedSheets = Math.max(0, Math.ceil(baseSheets * (1 + wastage)));
+    const ridgeLength = getRidgeLength(roofType, length, width);
+    const ridgeCaps = Math.max(0, Math.ceil(ridgeLength / 2));
+    const screws = includeScrews ? Math.max(0, Math.ceil(roofArea * 9)) : 0;
+    const screwBoxes = includeScrews ? Math.max(0, Math.ceil(screws / 250)) : 0;
+    const nails = includeNails ? Math.max(0, Math.ceil(roofArea * 6)) : 0;
+    const nailBoxes = includeNails ? Math.max(0, Math.ceil(nails / 200)) : 0;
+    const timberLength = includeTimber ? Math.max(0, Math.ceil(roofArea * getTimberFactor(roofType))) : 0;
+    const rainwaterLitres = includeRainwater ? Math.max(0, Math.round(roofArea * rainfall * 0.8)) : 0;
+
+    const sheetCost = recommendedSheets * sheetPrice;
+    const ridgeCost = ridgeCaps * ridgePrice;
+    const screwCost = screws * screwPrice;
+    const nailCost = nails * nailPrice;
+    const timberCost = timberLength * timberPrice;
+    const materialCost = sheetCost + ridgeCost + screwCost + nailCost + timberCost;
+    const grandTotal = materialCost + labour;
+
+    document.getElementById('roofArea').textContent = `${formatNumber(roofArea)} m²`;
+    document.getElementById('recommendedSheets').textContent = recommendedSheets;
+    document.getElementById('ridgeCaps').textContent = ridgeCaps;
+    document.getElementById('rainwaterLitres').textContent = `${formatNumber(rainwaterLitres)} L`;
+    document.getElementById('totalSheets').textContent = `${recommendedSheets} sheets`;
+    document.getElementById('screwsRequired').textContent = includeScrews ? `${formatNumber(screws)} screws (${screwBoxes} boxes)` : 'Excluded';
+    document.getElementById('nailsRequired').textContent = includeNails ? `${formatNumber(nails)} nails (${nailBoxes} boxes)` : 'Excluded';
+    document.getElementById('timberLength').textContent = includeTimber ? `${formatNumber(timberLength)} m` : 'Excluded';
+    document.getElementById('materialCost').textContent = numberFormat.format(materialCost);
+    document.getElementById('labourCostResult').textContent = numberFormat.format(labour);
+    document.getElementById('grandTotal').textContent = numberFormat.format(grandTotal);
+}
+
+formFields.forEach((field) => {
+    const element = document.getElementById(field);
+    if (!element) return;
+    element.addEventListener('input', updateEstimate);
+    if (element.type === 'checkbox') {
+        element.addEventListener('change', updateEstimate);
+    }
+});
+
+updateEstimate();
+</script>
+{% endblock %}
