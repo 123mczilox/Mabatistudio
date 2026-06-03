@@ -9,6 +9,8 @@ DEBUG = True  # Set to False for production, True for development
 
 ALLOWED_HOSTS = [
     'mabati-hub-kenya.onrender.com',
+    'www.mabatihubkenya.co.ke',
+    'mabatihubkenya.co.ke',
 ]
 
 INSTALLED_APPS = [
