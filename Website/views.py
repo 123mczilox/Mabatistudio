@@ -210,6 +210,9 @@ def roof_calculator(request):
 
         messages.success(request, f'Official quote saved: {quote_saved.quote_number}')
 
+    roof_types = ['Gable Roof', 'Hip Roof', 'Mono-Pitch Roof', 'Flat Roof']
+    pitch_options = ['15', '20', '25', '30', '35', '40']
+
     return render(request, 'roof_calculator.html', {
         'current_page': 'roof_calculator',
         'profiles': profiles,
@@ -217,6 +220,8 @@ def roof_calculator(request):
         'color_variants': color_variants,
         'initial_data': initial_data,
         'quote_saved': quote_saved,
+        'roof_types': roof_types,
+        'pitch_options': pitch_options,
     })
 
 

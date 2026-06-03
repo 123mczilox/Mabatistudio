@@ -79,7 +79,7 @@
                             <div class="col-6">
                                 <label for="roofType" class="form-label">Roof Type</label>
                                 <select id="roofType" name="roofType" class="form-select">
-                                    {% for option in ['Gable Roof','Hip Roof','Mono-Pitch Roof','Flat Roof'] %}
+                                    {% for option in roof_types %}
                                         <option value="{{ option }}" {% if initial_data.roofType == option %}selected{% endif %}>{{ option }}</option>
                                     {% endfor %}
                                 </select>
@@ -87,7 +87,7 @@
                             <div class="col-6">
                                 <label for="pitch" class="form-label">Roof Pitch (°)</label>
                                 <select id="pitch" name="pitch" class="form-select">
-                                    {% for option in ['15','20','25','30','35','40'] %}
+                                    {% for option in pitch_options %}
                                         <option value="{{ option }}" {% if initial_data.pitch == option %}selected{% endif %}>{{ option }}</option>
                                     {% endfor %}
                                 </select>
