@@ -7,7 +7,17 @@ from django.db.models import Q
 admin.site.site_header = "MabatiHubKenya Admin"
 admin.site.site_title = "MabatiHubKenya Admin Portal"
 admin.site.index_title = "MabatiHubKenya Administration"
-from .models import Product, ColorVariant, ProductType, ContactMessage, GalleryImage, ProductImage
+from .models import (
+    Product,
+    ColorVariant,
+    ProductType,
+    ContactMessage,
+    GalleryImage,
+    ProductImage,
+    RoofingProfile,
+    RoofGauge,
+    RoofEstimate,
+)
 
 
 class ProductImageInline(admin.TabularInline):
@@ -96,6 +106,31 @@ class ContactMessageAdmin(admin.ModelAdmin):
         updated = queryset.update(is_read=False)
         self.message_user(request, f"{updated} message(s) marked as unread.")
     mark_as_unread.short_description = 'Mark selected messages as unread'
+
+
+@admin.register(RoofingProfile)
+class RoofingProfileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'cover_width', 'default_sheet_price', 'order')
+    prepopulated_fields = {'slug': ('name',)}
+    search_fields = ('name', 'description')
+    list_editable = ('cover_width', 'default_sheet_price', 'order')
+
+
+@admin.register(RoofGauge)
+class RoofGaugeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'price_multiplier', 'additional_cost', 'order')
+    prepopulated_fields = {'slug': ('name',)}
+    search_fields = ('name', 'description')
+    list_editable = ('price_multiplier', 'additional_cost', 'order')
+
+
+@admin.register(RoofEstimate)
+class RoofEstimateAdmin(admin.ModelAdmin):
+    list_display = ('quote_number', 'roof_type', 'profile', 'gauge', 'grand_total', 'status', 'created_at')
+    list_filter = ('status', 'created_at', 'profile', 'gauge')
+    search_fields = ('quote_number', 'roof_type', 'color')
+    readonly_fields = ('quote_number', 'created_at', 'updated_at')
+    ordering = ('-created_at',)
 
 
 @admin.register(GalleryImage)

@@ -1,4 +1,8 @@
+import uuid
+from decimal import Decimal
+
 from django.db import models
+from django.utils import timezone
 from django.utils.text import slugify
 from django.urls import reverse
 from core.supa_storage import upload_image
@@ -156,6 +160,105 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.view_type}"
+
+
+class RoofingProfile(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
+    cover_width = models.DecimalField(max_digits=5, decimal_places=2, default=1.0)
+    default_sheet_price = models.DecimalField(max_digits=10, decimal_places=2, default=1800)
+    description = models.TextField(blank=True)
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        verbose_name = 'Roofing Profile'
+        verbose_name_plural = 'Roofing Profiles'
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class RoofGauge(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
+    price_multiplier = models.DecimalField(max_digits=5, decimal_places=3, default=1.0)
+    additional_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    description = models.CharField(max_length=255, blank=True)
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        verbose_name = 'Roof Gauge'
+        verbose_name_plural = 'Roof Gauges'
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class RoofEstimate(models.Model):
+    STATUS_CHOICES = [
+        ('requested', 'Requested'),
+        ('sent', 'Sent'),
+        ('approved', 'Approved'),
+    ]
+
+    quote_number = models.CharField(max_length=40, unique=True, blank=True)
+    session_key = models.CharField(max_length=40, blank=True, null=True)
+    roof_type = models.CharField(max_length=100)
+    profile = models.ForeignKey(RoofingProfile, on_delete=models.SET_NULL, null=True)
+    gauge = models.ForeignKey(RoofGauge, on_delete=models.SET_NULL, null=True)
+    color = models.CharField(max_length=100, blank=True)
+    length = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    width = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    pitch = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    include_screws = models.BooleanField(default=True)
+    include_nails = models.BooleanField(default=True)
+    include_timber = models.BooleanField(default=True)
+    include_rainwater = models.BooleanField(default=True)
+    rainfall = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    roof_area = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    recommended_sheets = models.PositiveIntegerField(default=0)
+    ridge_caps = models.PositiveIntegerField(default=0)
+    screws = models.PositiveIntegerField(default=0)
+    nails = models.PositiveIntegerField(default=0)
+    timber_length = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    rainwater_litres = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    sheet_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    ridge_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    screw_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    nail_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    timber_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    labour_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    material_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    grand_total = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='requested')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Roof Estimate'
+        verbose_name_plural = 'Roof Estimates'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.quote_number or f"Estimate {self.pk}"
+
+    def save(self, *args, **kwargs):
+        if not self.quote_number:
+            timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+            self.quote_number = f'RH-{timestamp}-{uuid.uuid4().hex[:4].upper()}'
+        super().save(*args, **kwargs)
 
 
 class ContactMessage(models.Model):

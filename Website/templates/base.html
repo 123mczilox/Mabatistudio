@@ -25,6 +25,7 @@
         <li class="nav-item"><a class="nav-link {% if current_page == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a></li>
         <li class="nav-item"><a class="nav-link {% if current_page == 'products' %}active{% endif %}" href="{% url 'products' %}">Products</a></li>
         <li class="nav-item"><a class="nav-link {% if current_page == 'roof_calculator' %}active{% endif %}" href="{% url 'roof_calculator' %}">Estimate</a></li>
+        <li class="nav-item"><a class="nav-link {% if current_page == 'history' %}active{% endif %}" href="{% url 'quote_history' %}">My Estimates</a></li>
         <li class="nav-item"><a class="nav-link {% if current_page == 'gallery' %}active{% endif %}" href="{% url 'gallery' %}">Gallery</a></li>
         <li class="nav-item"><a class="nav-link {% if current_page == 'about' %}active{% endif %}" href="{% url 'about' %}">About</a></li>
         <li class="nav-item"><a class="nav-link {% if current_page == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact</a></li>
@@ -38,6 +39,43 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<a class="whatsapp-fab" href="https://wa.me/254700000000?text=Hi%20MabatiHubKenya,%20I%20need%20a%20roof%20estimate" target="_blank" rel="noopener">
+    <i class="fab fa-whatsapp"></i>
+    <span>WhatsApp</span>
+</a>
+<style>
+.whatsapp-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 999;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    border-radius: 999px;
+    background: #25d366;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+    text-decoration: none;
+}
+.whatsapp-fab:hover {
+    transform: translateY(-2px);
+    background: #1ebe57;
+}
+.whatsapp-fab i {
+    font-size: 1.25rem;
+}
+@media (max-width: 576px) {
+    .whatsapp-fab {
+        right: 12px;
+        bottom: 12px;
+        padding: 0.75rem 0.85rem;
+    }
+    .whatsapp-fab span { display: none; }
+}
+</style>
 {% block extra_js %}{% endblock %}
 </body>
 </html>
