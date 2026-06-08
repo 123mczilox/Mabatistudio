@@ -8,6 +8,7 @@ SECRET_KEY = 'django-insecure-^to=+eufdcd1a+i=1do-86_-u!@&0o6mm2v5*czib-3o7jpvzu
 DEBUG = True  # Set to False for production, True for development
 
 ALLOWED_HOSTS = [
+    
     'mabati-hub-kenya.onrender.com',
     'www.mabatihubkenya.co.ke',
     'mabatihubkenya.co.ke',

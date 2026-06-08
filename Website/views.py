@@ -2,6 +2,7 @@ import math
 from decimal import Decimal, InvalidOperation
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
@@ -51,6 +52,14 @@ def contact(request):
     else:
         form = ContactForm()
     return render(request, 'contact.html', {'current_page': 'contact', 'form': form})
+
+
+def robots_txt(request):
+    content = """User-agent: *
+Allow: /
+
+Sitemap: https://mabatihubkenya.co.ke/sitemap.xml"""
+    return HttpResponse(content, content_type='text/plain')
 
 
 def parse_decimal(value, default=Decimal('0')):
