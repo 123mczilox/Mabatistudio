@@ -77,6 +77,11 @@
                                 <input id="width" name="width" type="number" min="0" step="0.1" class="form-control" placeholder="100" value="{{ initial_data.width }}">
                             </div>
                             <div class="col-6">
+                                <label for="eaves" class="form-label">Roof Overhang / Eaves (m)</label>
+                                <input id="eaves" name="eaves" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.eaves }}">
+                                <div class="form-text">Add roof overhang measured from the wall edge to the eaves/verge.</div>
+                            </div>
+                            <div class="col-6">
                                 <label for="roofType" class="form-label">Roof Type</label>
                                 <select id="roofType" name="roofType" class="form-select">
                                     {% for option in roof_types %}
@@ -127,6 +132,31 @@
                                         <option value="Charcoal Grey">Charcoal Grey</option>
                                     {% endif %}
                                 </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="sheetTotalWidth" class="form-label">Sheet Total Width (m)</label>
+                                <input id="sheetTotalWidth" name="sheetTotalWidth" type="number" min="0" step="0.01" class="form-control" placeholder="1.05" value="{{ initial_data.sheetTotalWidth }}">
+                                <div class="form-text">Actual sheet width before side lap is subtracted.</div>
+                            </div>
+                            <div class="col-6">
+                                <label for="sheetTotalLength" class="form-label">Sheet Total Length (m)</label>
+                                <input id="sheetTotalLength" name="sheetTotalLength" type="number" min="0" step="0.01" class="form-control" placeholder="3.05" value="{{ initial_data.sheetTotalLength }}">
+                                <div class="form-text">Actual sheet length before end laps and overhangs.</div>
+                            </div>
+                            <div class="col-6">
+                                <label for="sideLap" class="form-label">Side Lap (m)</label>
+                                <input id="sideLap" name="sideLap" type="number" min="0" step="0.01" class="form-control" placeholder="0.05" value="{{ initial_data.sideLap }}">
+                                <div class="form-text">Side overlap that reduces effective sheet width.</div>
+                            </div>
+                            <div class="col-6">
+                                <label for="endLap" class="form-label">End Lap (m)</label>
+                                <input id="endLap" name="endLap" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.endLap }}">
+                                <div class="form-text">End lap between vertically stacked sheets.</div>
+                            </div>
+                            <div class="col-6">
+                                <label for="endOverhang" class="form-label">End Overhang (m)</label>
+                                <input id="endOverhang" name="endOverhang" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.endOverhang }}">
+                                <div class="form-text">Extra overhang added to sheet length for eave projection.</div>
                             </div>
                             <div class="col-6">
                                 <label for="sheetPrice" class="form-label">Sheet Price (KES)</label>
@@ -351,7 +381,8 @@
 <script>
 const numberFormat = new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 });
 const formFields = [
-    'length', 'width', 'roofType', 'pitch', 'profile', 'gauge', 'color',
+    'length', 'width', 'eaves', 'roofType', 'pitch', 'profile', 'gauge', 'color',
+    'sheetTotalWidth', 'sheetTotalLength', 'sideLap', 'endLap', 'endOverhang',
     'sheetPrice', 'ridgePrice', 'screwPrice', 'nailPrice', 'timberPrice', 'labourCost', 'rainfall',
     'includeScrews', 'includeNails', 'includeTimber', 'includeRainwater'
 ];
@@ -410,8 +441,14 @@ function formatNumber(value) {
 function updateEstimate() {
     const length = Number(document.getElementById('length').value) || 0;
     const width = Number(document.getElementById('width').value) || 0;
+    const eaves = Number(document.getElementById('eaves').value) || 0;
     const pitch = Number(document.getElementById('pitch').value) || 0;
     const roofType = document.getElementById('roofType').value;
+    const sheetTotalWidth = Number(document.getElementById('sheetTotalWidth').value) || 0;
+    const sheetTotalLength = Number(document.getElementById('sheetTotalLength').value) || 0;
+    const sideLap = Number(document.getElementById('sideLap').value) || 0;
+    const endLap = Number(document.getElementById('endLap').value) || 0;
+    const endOverhang = Number(document.getElementById('endOverhang').value) || 0;
     const profileOption = getSelectedProfileOption();
     const gaugeOption = getSelectedGaugeOption();
     const baseSheetPrice = Number(profileOption?.dataset.sheetPrice || 0);
@@ -432,10 +469,22 @@ function updateEstimate() {
 
     document.getElementById('sheetPrice').value = Math.round(sheetPrice);
 
-    const footprint = length * width;
+    const planLength = Math.max(0, length + eaves * 2);
+    const planWidth = Math.max(0, width + eaves * 2);
+    const footprint = planLength * planWidth;
     const slopeMultiplier = pitch > 0 ? 1 / Math.cos(pitch * Math.PI / 180) : 1;
     const roofArea = footprint ? footprint * getTypeFactor(roofType) * slopeMultiplier : 0;
-    const baseSheets = coverWidth ? roofArea / coverWidth : 0;
+
+    let effectiveSheetArea = 0;
+    if (sheetTotalWidth > 0 && sheetTotalLength > 0) {
+        const effectiveSheetWidth = Math.max(0, sheetTotalWidth - sideLap);
+        const effectiveSheetLength = Math.max(0, sheetTotalLength - endLap - endOverhang);
+        effectiveSheetArea = effectiveSheetWidth * effectiveSheetLength;
+    }
+    if (!effectiveSheetArea) {
+        effectiveSheetArea = coverWidth;
+    }
+    const baseSheets = effectiveSheetArea ? roofArea / effectiveSheetArea : 0;
     const wastage = getWastage(roofType);
     const recommendedSheets = Math.max(0, Math.ceil(baseSheets * (1 + wastage)));
     const ridgeLength = getRidgeLength(roofType, length, width);
@@ -475,16 +524,29 @@ function getCompareOption(selectId) {
     return select && select.options[select.selectedIndex];
 }
 
-function calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber) {
+function calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, eaves, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber, sheetTotalWidth, sheetTotalLength, sideLap, endLap, endOverhang) {
     const compareSheetPriceBase = Number(compareProfileOption?.dataset.sheetPrice || 0);
     const compareCoverWidth = getCoverWidth(compareProfileOption);
     const compareGaugeMultiplier = Number(compareGaugeOption?.dataset.priceMultiplier || 1.0);
     const compareGaugeAdditionalCost = Number(compareGaugeOption?.dataset.additionalCost || 0);
     const compareSheetPrice = compareSheetPriceBase ? compareSheetPriceBase * compareGaugeMultiplier + compareGaugeAdditionalCost : 0;
-    const footprint = length * width;
+    const planLength = Math.max(0, length + eaves * 2);
+    const planWidth = Math.max(0, width + eaves * 2);
+    const footprint = planLength * planWidth;
     const slopeMultiplier = pitch > 0 ? 1 / Math.cos(pitch * Math.PI / 180) : 1;
     const roofArea = footprint ? footprint * getTypeFactor(roofType) * slopeMultiplier : 0;
-    const baseSheets = compareCoverWidth ? roofArea / compareCoverWidth : 0;
+
+    let effectiveSheetArea = 0;
+    if (sheetTotalWidth > 0 && sheetTotalLength > 0) {
+        const effectiveSheetWidth = Math.max(0, sheetTotalWidth - sideLap);
+        const effectiveSheetLength = Math.max(0, sheetTotalLength - endLap - endOverhang);
+        effectiveSheetArea = effectiveSheetWidth * effectiveSheetLength;
+    }
+    if (!effectiveSheetArea) {
+        effectiveSheetArea = compareCoverWidth;
+    }
+
+    const baseSheets = effectiveSheetArea ? roofArea / effectiveSheetArea : 0;
     const wastage = getWastage(roofType);
     const recommendedSheets = Math.max(0, Math.ceil(baseSheets * (1 + wastage)));
     const ridgeLength = getRidgeLength(roofType, length, width);
@@ -507,6 +569,7 @@ function updateComparison(currentTotal) {
     const roofType = document.getElementById('roofType').value;
     const length = Number(document.getElementById('length').value) || 0;
     const width = Number(document.getElementById('width').value) || 0;
+    const eaves = Number(document.getElementById('eaves').value) || 0;
     const pitch = Number(document.getElementById('pitch').value) || 0;
     const ridgePrice = Number(document.getElementById('ridgePrice').value) || 0;
     const screwPrice = Number(document.getElementById('screwPrice').value) || 0;
@@ -516,7 +579,12 @@ function updateComparison(currentTotal) {
     const includeScrews = document.getElementById('includeScrews').checked;
     const includeNails = document.getElementById('includeNails').checked;
     const includeTimber = document.getElementById('includeTimber').checked;
-    const alternativeTotal = calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber);
+    const sheetTotalWidth = Number(document.getElementById('sheetTotalWidth').value) || 0;
+    const sheetTotalLength = Number(document.getElementById('sheetTotalLength').value) || 0;
+    const sideLap = Number(document.getElementById('sideLap').value) || 0;
+    const endLap = Number(document.getElementById('endLap').value) || 0;
+    const endOverhang = Number(document.getElementById('endOverhang').value) || 0;
+    const alternativeTotal = calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, eaves, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber, sheetTotalWidth, sheetTotalLength, sideLap, endLap, endOverhang);
     document.getElementById('alternativeComparisonTotal').textContent = numberFormat.format(alternativeTotal);
     document.getElementById('comparisonDifference').textContent = numberFormat.format(alternativeTotal - currentTotal);
 }

@@ -127,6 +127,12 @@ def roof_calculator(request):
         'includeNails': 'on',
         'includeTimber': 'on',
         'includeRainwater': 'on',
+        'eaves': '0.10',
+        'sheetTotalWidth': '1.05',
+        'sheetTotalLength': '3.05',
+        'sideLap': '0.05',
+        'endLap': '0.10',
+        'endOverhang': '0.10',
     }
     quote_saved = None
 
@@ -162,12 +168,37 @@ def roof_calculator(request):
         include_nails = request.POST.get('includeNails') == 'on'
         include_timber = request.POST.get('includeTimber') == 'on'
         include_rainwater = request.POST.get('includeRainwater') == 'on'
+        eaves = parse_decimal(request.POST.get('eaves', '0'))
+        sheet_total_width = parse_decimal(request.POST.get('sheetTotalWidth', '0'))
+        sheet_total_length = parse_decimal(request.POST.get('sheetTotalLength', '0'))
+        side_lap = parse_decimal(request.POST.get('sideLap', '0'))
+        end_lap = parse_decimal(request.POST.get('endLap', '0'))
+        end_overhang = parse_decimal(request.POST.get('endOverhang', '0'))
 
-        footprint = float(length) * float(width)
+        initial_data.update({
+            'eaves': str(eaves),
+            'sheetTotalWidth': str(sheet_total_width),
+            'sheetTotalLength': str(sheet_total_length),
+            'sideLap': str(side_lap),
+            'endLap': str(end_lap),
+            'endOverhang': str(end_overhang),
+        })
+
+        plan_length = float(length + eaves * 2)
+        plan_width = float(width + eaves * 2)
+        footprint = plan_length * plan_width
         slope_multiplier = 1 / math.cos(math.radians(float(pitch))) if float(pitch) > 0 else 1
         roof_area = Decimal(str(footprint * get_type_factor(roof_type) * slope_multiplier))
-        cover_width = float(profile.cover_width) if profile else 1.0
-        base_sheets = float(roof_area) / cover_width if cover_width else 0
+
+        effective_sheet_area = 0
+        if sheet_total_width > 0 and sheet_total_length > 0:
+            effective_sheet_width = max(0.0, float(sheet_total_width - side_lap))
+            effective_sheet_length = max(0.0, float(sheet_total_length - end_lap - end_overhang))
+            effective_sheet_area = effective_sheet_width * effective_sheet_length
+        if effective_sheet_area <= 0:
+            effective_sheet_area = float(profile.cover_width) if profile and profile.cover_width else 1.0
+
+        base_sheets = float(roof_area) / effective_sheet_area if effective_sheet_area else 0
         recommended_sheets = max(0, int((base_sheets * (1 + get_wastage(roof_type))) // 1 + (1 if (base_sheets * (1 + get_wastage(roof_type))) % 1 else 0)))
         ridge_length = get_ridge_length(roof_type, float(length), float(width))
         ridge_caps = max(0, int((ridge_length / 2) // 1 + (1 if (ridge_length / 2) % 1 else 0)))
@@ -207,6 +238,12 @@ def roof_calculator(request):
             nails=nails,
             timber_length=timber_length,
             rainwater_litres=rainwater_litres,
+            eaves=eaves,
+            sheet_total_width=sheet_total_width,
+            sheet_total_length=sheet_total_length,
+            side_lap=side_lap,
+            end_lap=end_lap,
+            end_overhang=end_overhang,
             sheet_price=sheet_price,
             ridge_price=ridge_price,
             screw_price=screw_price,
