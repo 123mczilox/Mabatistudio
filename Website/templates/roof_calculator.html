@@ -68,6 +68,21 @@
                     <div class="card shadow-sm estimator-card p-4">
                         <h3 class="mb-4">Roof Estimate Inputs</h3>
                         <div class="row g-3">
+                            <div class="col-12">
+                                <div class="card border-secondary-subtle mb-3">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-5 p-3 text-center">
+                                            <img src="{% static 'images/roof-anatomy.svg' %}" alt="Roof anatomy diagram" class="img-fluid rounded-3 shadow-sm">
+                                            <img src="{% static 'images/roof design.jpg' %}" alt="Roof design" class="img-fluid rounded-3 shadow-sm mt-3">
+                                        </div>
+                                        <div class="col-md-7 p-3">
+                                            <h5 class="mb-2">Roof anatomy guide</h5>
+                                            <p class="mb-1">Use wall-to-wall measurements for the building base and add eaves to include the roof edge.</p>
+                                            <p class="mb-0">This diagram shows the ridge, rise, run, pitch, and eaves so you can enter the correct roof dimensions.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-6">
                                 <label for="length" class="form-label">Roof Building Length (m)</label>
                                 <input id="length" name="length" type="number" min="0" step="0.1" class="form-control" placeholder="50" value="{{ initial_data.length }}">
@@ -320,6 +335,7 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="col-12">
                         <div class="card shadow-sm result-card p-4">
                             <div class="d-flex align-items-center justify-content-between mb-3">
