@@ -158,7 +158,7 @@
                             <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Available Gauges</h6><p class="mb-0 fw-semibold">{{ p.gauge|default:'-' }}</p></div></div>
                             <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Warranty</h6><p class="mb-0 fw-semibold">{{ p.warranty|default:'-' }}</p></div></div>
                             <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Price</h6><p class="mb-0 fw-semibold">KES {{ p.price }}</p></div></div>
-                            <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Details</h6><p class="mb-0 fw-semibold">{% if p.roof_type %}{{ p.roof_type.name }}{% else %}-{% endif %}</p></div></div>
+                            <!-- <div class="col-md-6"><div class="spec-card p-4 rounded-4 shadow-sm"><h6 class="text-uppercase text-secondary mb-2">Details</h6><p class="mb-0 fw-semibold">{% if p.roof_type %}{{ p.roof_type.name }}{% else %}-{% endif %}</p></div></div> -->
                         </div>
                         <h5 class="fw-semibold mb-3">Why customers choose {{ p.name }}</h5>
                         <ul class="mb-4 product-benefits">
@@ -349,9 +349,9 @@
     </div>
 </section>
 
-<a id="stickyQuote" class="sticky-quote btn btn-primary btn-lg shadow-lg" href="{% url 'contact' %}">
+<!-- <a id="stickyQuote" class="sticky-quote btn btn-primary btn-lg shadow-lg" href="{% url 'contact' %}">
     <i class="fa-solid fa-envelope me-2"></i> Request Quote
-</a>
+</a> -->
 
 {% block extra_js %}
 <script src="{% static 'js/products.js' %}"></script>
