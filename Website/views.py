@@ -62,6 +62,41 @@ Sitemap: https://mabatihubkenya.co.ke/sitemap.xml"""
     return HttpResponse(content, content_type='text/plain')
 
 
+def sitemap_xml(request):
+    base_url = request.build_absolute_uri('/')
+    if base_url.endswith('/'):
+        base_url = base_url[:-1]
+
+    static_paths = [
+        '',
+        'gallery/',
+        'contact/',
+        'products/',
+        'roof-calculator/',
+        'about/',
+    ]
+
+    urls = [
+        f"{base_url}/{path}" if path else f"{base_url}/"
+        for path in static_paths
+    ]
+
+    products = Product.objects.all()
+    for product in products:
+        urls.append(f"{base_url}{product.get_absolute_url()}")
+
+    xml_urls = [
+        '  <url>\n    <loc>{}</loc>\n  </url>'.format(url)
+        for url in urls
+    ]
+    xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    xml_content += '\n'.join(xml_urls)
+    xml_content += '\n</urlset>'
+
+    return HttpResponse(xml_content, content_type='application/xml')
+
+
 def parse_decimal(value, default=Decimal('0')):
     try:
         return Decimal(value)
