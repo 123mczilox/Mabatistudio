@@ -7,14 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
     <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
-    <link rel="icon" type="image/png" href="{% block favicon %}{% static 'images/logo.png' %}{% endblock %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo.png' %}">
+    <link rel="icon" type="image/png" href="{% block favicon %}{% static 'images/logo.png' %}?v=2{% endblock %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo.png' %}?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo.png' %}?v=2">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo.png' %}?v=2">
     <link rel="manifest" href="{% static 'site.webmanifest' %}">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="{% static 'images/logo.png' %}">
+    <meta name="msapplication-TileImage" content="{% static 'images/logo.png' %}?v=2">
     <meta name="description" content="{% block meta_description %}Compare mabati prices, roofing sheets and roofing suppliers across Kenya. Find quality roofing materials, steel doors and roofing cost calculators at Mabati Hub Kenya.{% endblock %}">
     <meta name="keywords" content="{% block meta_keywords %}mabati kenya, roofing sheets kenya, mabati prices kenya, roofing materials kenya, steel doors kenya, decra kenya{% endblock %}">
     <meta property="og:title" content="{% block og_title %}Mabati Hub Kenya{% endblock %}">
@@ -27,7 +27,7 @@
     <meta name="twitter:description" content="{% block twitter_description %}Compare roofing sheets and mabati prices in Kenya.{% endblock %}">
     <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}{% endblock %}">
 
-    <script type="application/ld+json">
+    <!-- <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
@@ -35,13 +35,36 @@
       "url": "{{ request.scheme }}://{{ request.get_host }}",
       "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}"
     }
-    </script>
+    </script> -->
+    <script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"Organization",
+  "name":"Mabati Hub Kenya",
+  "url":"https://mabatihubkenya.co.ke",
+  "logo":"https://mabatihubkenya.co.ke/static/images/logo.png",
+  "telephone":"+254727147269",
+  "address":{
+    "@type":"PostalAddress",
+    "addressCountry":"KE"
+  }
+}
+</script>
     <title>{% block title %}MabatiHubKenya | Roofing Sheets, Mabati Prices & Suppliers in Kenya {% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9CJWRB28CQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-9CJWRB28CQ');
+</script>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3 shadow-sm sticky-top">
   <div class="container">
