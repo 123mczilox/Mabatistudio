@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
     <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
-    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
     <link rel="icon" type="image/png" href="{% block favicon %}{% static 'images/logo.png' %}?v=3{% endblock %}">
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo.png' %}?v=3">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo.png' %}?v=3">
