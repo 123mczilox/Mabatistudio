@@ -1,0 +1,145 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    background-color: #10233f !important;
+}
+
+.navbar-logo {
+    width: 62px !important;
+    height: 62px !important;
+}
+
+.navbar-brand-text {
+    font-size: 1.2rem;
+    color: #ffffff;
+}
+
+.service-card-logo {
+    width: 72px;
+    height: auto;
+    display: block;
+    margin: 0 auto 1rem;
+}
+
+.hero-section {
+    background: linear-gradient(rgba(124, 151, 192, 0.7), rgba(16, 35, 63, 0.7)), url('/static/images/roofing.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 600px;
+    color: white;
+}
+
+.hero-section h1,
+.hero-section p,
+.hero-section .lead {
+    color: #f8f9fa !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.stats-section {
+    background: transparent;
+    color: inherit;
+}
+
+.stats-section .container,
+.stats-section .row,
+.stats-section .col-md-3 {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.stats-section h2,
+.stats-section .display-4,
+.stats-section .lead,
+.stats-section p {
+    color: inherit;
+}
+.hero-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-accent-bar {
+    width: 140px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(245, 92, 49, 0.95);
+    box-shadow: 0 10px 35px rgba(245, 92, 49, 0.24);
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards 0.25s;
+}
+
+.hero-title,
+.hero-subtitle,
+.hero-cta {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: fadeInUp 0.85s ease forwards;
+}
+
+.hero-title {
+    animation-delay: 0.15s;
+}
+
+.hero-subtitle {
+    animation-delay: 0.35s;
+}
+
+.hero-cta {
+    animation-delay: 0.6s;
+}
+
+.hero-section .btn {
+    min-width: 180px;
+}
+
+.stats-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: rgba(255, 255, 255, 0.96);
+    animation: fadeInUp 0.9s ease forwards;
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+.stats-section .row > .col-md-3:nth-child(1) .stats-card {
+    animation-delay: 0.25s;
+}
+
+.stats-section .row > .col-md-3:nth-child(2) .stats-card {
+    animation-delay: 0.35s;
+}
+
+.stats-section .row > .col-md-3:nth-child(3) .stats-card {
+    animation-delay: 0.45s;
+}
+
+.stats-section .row > .col-md-3:nth-child(4) .stats-card {
+    animation-delay: 0.55s;
+}
+
+.services-section .card,
+section.py-5 .card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.services-section .card:hover,
+section.py-5 .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 55px rgba(16, 35, 63, 0.12);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

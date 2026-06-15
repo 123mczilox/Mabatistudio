@@ -1,0 +1,157 @@
+/* Products page styling for MabatiHubKenya */
+body {
+    background-color: #f5f8fb;
+    color: #1f2937;
+}
+
+.hero-products {
+    position: relative;
+    min-height: 680px;
+    background-image: linear-gradient(rgba(11, 24, 39, 0.72), rgba(11, 24, 39, 0.72)), url('/static/images/roofing-hero.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+}
+.hero-products .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(9, 28, 54, 0.5), rgba(9, 28, 54, 0.92));
+}
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+.hero-products .badge {
+    letter-spacing: 0.18em;
+}
+
+.category-overview .category-card {
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+    overflow: hidden;
+}
+.category-overview .category-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12);
+}
+.category-overview .category-card img {
+    height: 210px;
+    object-fit: cover;
+}
+.category-overview .category-card .btn {
+    width: 100%;
+}
+
+.section-header h2 {
+    font-size: clamp(2rem, 2.5vw, 3rem);
+}
+
+.product-section {
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+.product-section:first-of-type {
+    border-top: none;
+}
+.product-carousel img {
+    height: 420px;
+    object-fit: cover;
+}
+.product-copy {
+    padding-top: 0.5rem;
+}
+.spec-card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+.product-benefits li {
+    margin-bottom: 0.8rem;
+    color: #374151;
+}
+.color-variant-row {
+    margin-top: 1rem;
+}
+.color-variant-card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    min-height: 88px;
+}
+.color-pill {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: block;
+    background: linear-gradient(135deg, #223d51 0%, #0f172a 100%);
+    margin-bottom: 0.9rem;
+}
+
+.info-card,
+.comparison-card,
+.recommend-card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+.info-card h4,
+.comparison-title,
+.recommend-card h5 {
+    color: #10233f;
+}
+
+.faq-section .accordion-item {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+.faq-section .accordion-button {
+    color: #10233f;
+    background: #ffffff;
+}
+.faq-section .accordion-body {
+    background: #f8fafc;
+}
+
+.quote-banner {
+    background-image: linear-gradient(135deg, rgba(32, 129, 226, 0.92), rgba(14, 34, 76, 0.92)), url('/static/images/quote-hero.jpg');
+    background-size: cover;
+    background-position: center;
+    color: #ffffff;
+    min-height: 340px;
+}
+.quote-banner .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(4, 18, 46, 0.72);
+}
+.quote-banner .position-relative {
+    position: relative;
+    z-index: 2;
+}
+
+.sticky-quote {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1100;
+    border-radius: 999px;
+    padding: 0.9rem 1.35rem;
+}
+
+@media (max-width: 991px) {
+    .hero-products {
+        min-height: 540px;
+    }
+    .product-carousel img {
+        height: 320px;
+    }
+    .sticky-quote {
+        right: 16px;
+        bottom: 16px;
+    }
+}
+
+@media (max-width: 767px) {
+    .hero-products {
+        min-height: 500px;
+        background-position: top center;
+    }
+    .color-variant-card {
+        min-height: 80px;
+    }
+}
