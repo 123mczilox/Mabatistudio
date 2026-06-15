@@ -57,7 +57,7 @@ class Product(models.Model):
     )
 
     gauge = models.CharField(max_length=20, blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     color_variants = models.ManyToManyField(
         ColorVariant,
@@ -114,6 +114,28 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
+
+    @property
+    def display_price(self):
+        if self.price is not None:
+            return self.price
+        first_variant = self.gauge_variants.order_by('order').select_related('gauge').first()
+        return first_variant.price if first_variant else Decimal('0')
+
+    @property
+    def display_gauges(self):
+        if self.gauge:
+            return self.gauge
+        variants = self.gauge_variants.select_related('gauge').all()
+        labels = [variant.gauge.name for variant in variants if variant.gauge]
+        if not labels:
+            return '-'
+        unique_labels = sorted(dict.fromkeys(labels))
+        return ', '.join(unique_labels)
+
+    @property
+    def has_gauge_variants(self):
+        return self.gauge_variants.exists()
 
     @property
     def main_image_url(self):

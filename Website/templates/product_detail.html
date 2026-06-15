@@ -39,11 +39,11 @@
         <div class="col-md-6">
             <h1 class="mb-3">{{ product.name }}</h1>
             <p class="text-muted">{% if product.roof_type %}{{ product.roof_type.name }}{% endif %}</p>
-            <h3 class="text-primary">KES {{ product.price }}</h3>
+            <h3 class="text-primary">KES {{ product.display_price }}</h3>
             <p class="lead">{{ product.description }}</p>
 
             <div class="row g-3 mb-3">
-                <div class="col-6"><strong>Gauge:</strong> {{ product.gauge|default:'-' }}</div>
+                <div class="col-6"><strong>Gauge:</strong> {{ product.display_gauges }}</div>
                 <div class="col-6"><strong>Warranty:</strong> {{ product.warranty|default:'-' }}</div>
             </div>
 
@@ -58,6 +58,16 @@
                 {% endif %}
             </ul>
 
+            {% if product.has_gauge_variants %}
+            <div class="mb-4">
+                <h5>Available gauge variants</h5>
+                <ul class="list-unstyled">
+                    {% for variant in product.gauge_variants.all %}
+                        <li>{{ variant.gauge.name }} — KES {{ variant.price }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
             <div class="d-flex gap-3 mt-4">
                 <!-- <a class="btn btn-primary btn-lg" href="{% url 'roof_calculator' %}">Calculate Estimate</a> -->
                 <a class="btn btn-outline-secondary btn-lg" href="https://wa.me/254712985747?text=Hi%20MabatiHubKenya,%20I%20need%20a%20more%20information%20about%20this%20{{ product.name }}" target="_blank">Request Quote</a>

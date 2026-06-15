@@ -350,7 +350,7 @@ def about(request):
 
 # Product list view: fetches products dynamically from the database
 def products(request):
-    products = Product.objects.select_related('product_type').prefetch_related('images', 'color_variants').all()
+    products = Product.objects.select_related('product_type').prefetch_related('images', 'color_variants', 'gauge_variants__gauge').all()
     product_type_slug = request.GET.get('product_type')
     color_slug = request.GET.get('color')
     search = request.GET.get('q')
@@ -366,7 +366,7 @@ def products(request):
     product_types = ProductType.objects.order_by('name')
     color_variants = ColorVariant.objects.order_by('name')
 
-    featured_products = Product.objects.filter(featured=True).select_related('product_type').prefetch_related('images', 'color_variants')
+    featured_products = Product.objects.filter(featured=True).select_related('product_type').prefetch_related('images', 'color_variants', 'gauge_variants__gauge')
     context = {
         'products': products,
         'featured_products': featured_products,
@@ -382,7 +382,7 @@ def products(request):
 
 # Product detail view: shows a single product
 def product_detail(request, slug):
-    product = get_object_or_404(Product.objects.select_related('product_type').prefetch_related('images', 'color_variants'), slug=slug)
+    product = get_object_or_404(Product.objects.select_related('product_type').prefetch_related('images', 'color_variants', 'gauge_variants__gauge'), slug=slug)
     color_variants = product.color_variants.all()
     context = {
         'product': product,

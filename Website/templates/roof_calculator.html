@@ -575,8 +575,9 @@ function updateEstimate() {
         effectiveSheetArea = effectiveSheetWidth * effectiveSheetLength;
     }
     if (!effectiveSheetArea) {
-        effectiveSheetArea = coverWidth;
+        effectiveSheetArea = coverWidth && sheetTotalLength ? coverWidth * sheetTotalLength : coverWidth;
     }
+    const baseSheets = effectiveSheetArea ? roofArea / effectiveSheetArea : 0;
     const wastage = getWastage(roofType);
     const recommendedSheets = Math.max(0, Math.ceil(baseSheets * (1 + wastage)));
     const ridgeLength = getRidgeLength(roofType, length, width);
@@ -616,17 +617,22 @@ function getCompareOption(selectId) {
     return select && select.options[select.selectedIndex];
 }
 
-function calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, eaves, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber, sheetTotalWidth, sheetTotalLength, sideLap, endLap, endOverhang) {
+function calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, eaves, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber, sheetTotalWidth, sheetTotalLength, sideLap, endLap, endOverhang, calculationMethod, directArea) {
     const compareSheetPriceBase = Number(compareProfileOption?.dataset.sheetPrice || 0);
     const compareCoverWidth = getCoverWidth(compareProfileOption);
     const compareGaugeMultiplier = Number(compareGaugeOption?.dataset.priceMultiplier || 1.0);
     const compareGaugeAdditionalCost = Number(compareGaugeOption?.dataset.additionalCost || 0);
     const compareSheetPrice = compareSheetPriceBase ? compareSheetPriceBase * compareGaugeMultiplier + compareGaugeAdditionalCost : 0;
-    const planLength = Math.max(0, length + eaves * 2);
-    const planWidth = Math.max(0, width + eaves * 2);
-    const footprint = planLength * planWidth;
-    const slopeMultiplier = pitch > 0 ? 1 / Math.cos(pitch * Math.PI / 180) : 1;
-    const roofArea = footprint ? footprint * getTypeFactor(roofType) * slopeMultiplier : 0;
+    let roofArea = 0;
+    if (calculationMethod === 'direct_area') {
+        roofArea = Number(directArea) || 0;
+    } else {
+        const planLength = Math.max(0, length + eaves * 2);
+        const planWidth = Math.max(0, width + eaves * 2);
+        const footprint = planLength * planWidth;
+        const slopeMultiplier = pitch > 0 ? 1 / Math.cos(pitch * Math.PI / 180) : 1;
+        roofArea = footprint ? footprint * getTypeFactor(roofType) * slopeMultiplier : 0;
+    }
 
     let effectiveSheetArea = 0;
     if (sheetTotalWidth > 0 && sheetTotalLength > 0) {
@@ -676,7 +682,9 @@ function updateComparison(currentTotal) {
     const sideLap = Number(document.getElementById('sideLap').value) || 0;
     const endLap = Number(document.getElementById('endLap').value) || 0;
     const endOverhang = Number(document.getElementById('endOverhang').value) || 0;
-    const alternativeTotal = calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, eaves, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber, sheetTotalWidth, sheetTotalLength, sideLap, endLap, endOverhang);
+    const calculationMethod = document.querySelector('input[name="calculationMethod"]:checked')?.value || 'dimensions';
+    const directArea = Number(document.getElementById('directArea')?.value) || 0;
+    const alternativeTotal = calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, eaves, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber, sheetTotalWidth, sheetTotalLength, sideLap, endLap, endOverhang, calculationMethod, directArea);
     document.getElementById('alternativeComparisonTotal').textContent = numberFormat.format(alternativeTotal);
     document.getElementById('comparisonDifference').textContent = numberFormat.format(alternativeTotal - currentTotal);
 }
