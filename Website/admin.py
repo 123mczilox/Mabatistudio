@@ -17,7 +17,15 @@ from .models import (
     RoofingProfile,
     RoofGauge,
     RoofEstimate,
+    ProductGaugeVariant,
 )
+
+
+class ProductGaugeVariantInline(admin.TabularInline):
+    model = ProductGaugeVariant
+    extra = 1
+    fields = ('gauge', 'finish_type', 'price', 'order')
+    ordering = ('order',)
 
 
 class ProductImageInline(admin.TabularInline):
@@ -44,7 +52,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ('product_type', 'featured', 'created_at', 'color_variants')
     date_hierarchy = 'created_at'
     prepopulated_fields = {'slug': ('name',)}
-    inlines = [ProductImageInline]
+    inlines = [ProductGaugeVariantInline, ProductImageInline]
     readonly_fields = ('thumbnail',)
     filter_horizontal = ('color_variants',)
     autocomplete_fields = ('product_type',)
@@ -131,6 +139,15 @@ class RoofEstimateAdmin(admin.ModelAdmin):
     search_fields = ('quote_number', 'roof_type', 'color')
     readonly_fields = ('quote_number', 'created_at', 'updated_at')
     ordering = ('-created_at',)
+
+
+@admin.register(ProductGaugeVariant)
+class ProductGaugeVariantAdmin(admin.ModelAdmin):
+    list_display = ('product', 'gauge', 'finish_type', 'price', 'order')
+    list_filter = ('gauge', 'product__product_type')
+    search_fields = ('product__name', 'gauge__name')
+    list_editable = ('price', 'order')
+    ordering = ('product', 'order')
 
 
 @admin.register(GalleryImage)

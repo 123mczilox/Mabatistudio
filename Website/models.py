@@ -206,21 +206,55 @@ class RoofGauge(models.Model):
         super().save(*args, **kwargs)
 
 
+class ProductGaugeVariant(models.Model):
+    """Links Product to Gauge with custom pricing per gauge variant"""
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='gauge_variants'
+    )
+    gauge = models.ForeignKey(RoofGauge, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    finish_type = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="e.g., Matt Finish, Glossy, etc."
+    )
+    order = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('product', 'gauge', 'finish_type')
+        ordering = ['order', 'gauge__order']
+        verbose_name = 'Product Gauge Variant'
+        verbose_name_plural = 'Product Gauge Variants'
+
+    def __str__(self):
+        return f"{self.product.name} - {self.gauge.name} ({self.finish_type or 'Standard'}) - KES {self.price}"
+
+
 class RoofEstimate(models.Model):
     STATUS_CHOICES = [
         ('requested', 'Requested'),
         ('sent', 'Sent'),
         ('approved', 'Approved'),
     ]
+    
+    CALCULATION_METHODS = [
+        ('dimensions', 'Dimensions (Length × Width)'),
+        ('direct_area', 'Direct Area (m²)'),
+    ]
 
     quote_number = models.CharField(max_length=40, unique=True, blank=True)
     session_key = models.CharField(max_length=40, blank=True, null=True)
+    calculation_method = models.CharField(max_length=20, choices=CALCULATION_METHODS, default='dimensions')
     roof_type = models.CharField(max_length=100)
     profile = models.ForeignKey(RoofingProfile, on_delete=models.SET_NULL, null=True)
     gauge = models.ForeignKey(RoofGauge, on_delete=models.SET_NULL, null=True)
     color = models.CharField(max_length=100, blank=True)
     length = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     width = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    direct_area = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Used when calculation_method is 'direct_area'")
     pitch = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     include_screws = models.BooleanField(default=True)
     include_nails = models.BooleanField(default=True)

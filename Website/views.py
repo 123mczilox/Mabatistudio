@@ -151,6 +151,8 @@ def roof_calculator(request):
         'profile': str(profiles.first().pk) if profiles.exists() else '',
         'gauge': str(gauges.first().pk) if gauges.exists() else '',
         'color': 'Charcoal Grey',
+        'calculationMethod': 'dimensions',
+        'directArea': '0',
         'sheetPrice': '1800',
         'ridgePrice': '800',
         'screwPrice': '5',
@@ -197,6 +199,8 @@ def roof_calculator(request):
         length = parse_decimal(request.POST.get('length', '0'))
         width = parse_decimal(request.POST.get('width', '0'))
         pitch = parse_decimal(request.POST.get('pitch', '0'))
+        calculation_method = request.POST.get('calculationMethod', 'dimensions')
+        direct_area = parse_decimal(request.POST.get('directArea', '0'))
         roof_type = request.POST.get('roofType', 'Gable Roof')
         color = request.POST.get('color', '').strip()
         include_screws = request.POST.get('includeScrews') == 'on'
@@ -217,13 +221,21 @@ def roof_calculator(request):
             'sideLap': str(side_lap),
             'endLap': str(end_lap),
             'endOverhang': str(end_overhang),
+            'calculationMethod': calculation_method,
+            'directArea': str(direct_area),
         })
 
-        plan_length = float(length + eaves * 2)
-        plan_width = float(width + eaves * 2)
-        footprint = plan_length * plan_width
-        slope_multiplier = 1 / math.cos(math.radians(float(pitch))) if float(pitch) > 0 else 1
-        roof_area = Decimal(str(footprint * get_type_factor(roof_type) * slope_multiplier))
+        # Calculate roof area based on method
+        if calculation_method == 'direct_area':
+            # User provided area directly in square meters
+            roof_area = direct_area
+        else:
+            # Calculate from dimensions
+            plan_length = float(length + eaves * 2)
+            plan_width = float(width + eaves * 2)
+            footprint = plan_length * plan_width
+            slope_multiplier = 1 / math.cos(math.radians(float(pitch))) if float(pitch) > 0 else 1
+            roof_area = Decimal(str(footprint * get_type_factor(roof_type) * slope_multiplier))
 
         effective_sheet_area = 0
         if sheet_total_width > 0 and sheet_total_length > 0:
@@ -254,12 +266,14 @@ def roof_calculator(request):
 
         quote_saved = RoofEstimate.objects.create(
             session_key=request.session.session_key,
+            calculation_method=calculation_method,
             roof_type=roof_type,
             profile=profile,
             gauge=gauge,
             color=color,
             length=length,
             width=width,
+            direct_area=direct_area,
             pitch=pitch,
             include_screws=include_screws,
             include_nails=include_nails,

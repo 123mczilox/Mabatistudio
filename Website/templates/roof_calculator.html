@@ -61,13 +61,23 @@
                 {% endfor %}
             </div>
         {% endif %}
-        <form method="post" action="" id="roofEstimateForm">
+        <form method="post" action="" id="roofEstimateForm" onsubmit="return validateForm()">
             {% csrf_token %}
             <div class="row g-4">
                 <div class="col-lg-6">
                     <div class="card shadow-sm estimator-card p-4">
                         <h3 class="mb-4">Roof Estimate Inputs</h3>
                         <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label mb-2">How do you want to enter roof dimensions?</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="calculationMethod" id="methodDimensions" value="dimensions" {% if initial_data.calculationMethod == 'dimensions' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary" for="methodDimensions">Dimensions (Length × Width)</label>
+                                    
+                                    <input type="radio" class="btn-check" name="calculationMethod" id="methodDirectArea" value="direct_area" {% if initial_data.calculationMethod == 'direct_area' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary" for="methodDirectArea">Direct Area (m²)</label>
+                                </div>
+                            </div>
                             <div class="col-12">
                                 <div class="card border-secondary-subtle mb-3">
                                     <div class="row g-0 align-items-center">
@@ -83,18 +93,34 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <label for="length" class="form-label">Roof Building Length (m)</label>
-                                <input id="length" name="length" type="number" min="0" step="0.1" class="form-control" placeholder="50" value="{{ initial_data.length }}">
+                            <div id="dimensionsMode" class="col-12">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <label for="length" class="form-label">Roof Building Length (m)</label>
+                                        <input id="length" name="length" type="number" min="0" step="0.1" class="form-control" placeholder="50" value="{{ initial_data.length }}">
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="width" class="form-label">Roof Building Width (m)</label>
+                                        <input id="width" name="width" type="number" min="0" step="0.1" class="form-control" placeholder="100" value="{{ initial_data.width }}">
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="eaves" class="form-label">Roof Overhang / Eaves (m)</label>
+                                        <input id="eaves" name="eaves" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.eaves }}">
+                                        <div class="form-text">Add roof overhang measured from the wall edge to the eaves/verge.</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-6">
-                                <label for="width" class="form-label">Roof Building Width (m)</label>
-                                <input id="width" name="width" type="number" min="0" step="0.1" class="form-control" placeholder="100" value="{{ initial_data.width }}">
+                            <div id="directAreaMode" class="col-12" style="display:none;">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label for="directArea" class="form-label">Total Roof Area (m²)</label>
+                                        <input id="directArea" name="directArea" type="number" min="0" step="0.1" class="form-control" placeholder="e.g., 200" value="{{ initial_data.directArea }}">
+                                        <div class="form-text">Enter the total roofing area if you have a roof plan or already know the square meters needed.</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-6">
-                                <label for="eaves" class="form-label">Roof Overhang / Eaves (m)</label>
-                                <input id="eaves" name="eaves" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.eaves }}">
-                                <div class="form-text">Add roof overhang measured from the wall edge to the eaves/verge.</div>
+                            <div class="col-12">
+                                <hr class="my-2">
                             </div>
                             <div class="col-6">
                                 <label for="roofType" class="form-label">Roof Type</label>
@@ -396,8 +422,49 @@
 {% block extra_js %}
 <script>
 const numberFormat = new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 });
+
+// Toggle between dimensions and direct area modes
+document.querySelectorAll('input[name="calculationMethod"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const dimensionsMode = document.getElementById('dimensionsMode');
+        const directAreaMode = document.getElementById('directAreaMode');
+        if (this.value === 'dimensions') {
+            dimensionsMode.style.display = 'block';
+            directAreaMode.style.display = 'none';
+        } else {
+            dimensionsMode.style.display = 'none';
+            directAreaMode.style.display = 'block';
+        }
+    });
+});
+
+// Initialize visibility on page load
+const initialMethod = document.querySelector('input[name="calculationMethod"]:checked')?.value || 'dimensions';
+document.getElementById('dimensionsMode').style.display = initialMethod === 'dimensions' ? 'block' : 'none';
+document.getElementById('directAreaMode').style.display = initialMethod === 'direct_area' ? 'block' : 'none';
+
+function validateForm() {
+    const calculationMethod = document.querySelector('input[name="calculationMethod"]:checked')?.value || 'dimensions';
+    
+    if (calculationMethod === 'dimensions') {
+        const length = Number(document.getElementById('length').value) || 0;
+        const width = Number(document.getElementById('width').value) || 0;
+        if (length <= 0 || width <= 0) {
+            alert('Please enter both length and width (greater than 0)');
+            return false;
+        }
+    } else {
+        const directArea = Number(document.getElementById('directArea').value) || 0;
+        if (directArea <= 0) {
+            alert('Please enter a roof area greater than 0 square meters');
+            return false;
+        }
+    }
+    return true;
+}
+
 const formFields = [
-    'length', 'width', 'eaves', 'roofType', 'pitch', 'profile', 'gauge', 'color',
+    'length', 'width', 'eaves', 'roofType', 'pitch', 'profile', 'gauge', 'color', 'calculationMethod', 'directArea',
     'sheetTotalWidth', 'sheetTotalLength', 'sideLap', 'endLap', 'endOverhang',
     'sheetPrice', 'ridgePrice', 'screwPrice', 'nailPrice', 'timberPrice', 'labourCost', 'rainfall',
     'includeScrews', 'includeNails', 'includeTimber', 'includeRainwater'
@@ -455,11 +522,27 @@ function formatNumber(value) {
 }
 
 function updateEstimate() {
-    const length = Number(document.getElementById('length').value) || 0;
-    const width = Number(document.getElementById('width').value) || 0;
-    const eaves = Number(document.getElementById('eaves').value) || 0;
-    const pitch = Number(document.getElementById('pitch').value) || 0;
-    const roofType = document.getElementById('roofType').value;
+    const calculationMethod = document.querySelector('input[name="calculationMethod"]:checked')?.value || 'dimensions';
+    let roofArea = 0;
+    
+    if (calculationMethod === 'direct_area') {
+        // Use directly entered area
+        roofArea = Number(document.getElementById('directArea').value) || 0;
+    } else {
+        // Calculate from dimensions
+        const length = Number(document.getElementById('length').value) || 0;
+        const width = Number(document.getElementById('width').value) || 0;
+        const eaves = Number(document.getElementById('eaves').value) || 0;
+        const pitch = Number(document.getElementById('pitch').value) || 0;
+        const roofType = document.getElementById('roofType').value;
+        
+        const planLength = Math.max(0, length + eaves * 2);
+        const planWidth = Math.max(0, width + eaves * 2);
+        const footprint = planLength * planWidth;
+        const slopeMultiplier = pitch > 0 ? 1 / Math.cos(pitch * Math.PI / 180) : 1;
+        roofArea = footprint ? footprint * getTypeFactor(roofType) * slopeMultiplier : 0;
+    }
+    
     const sheetTotalWidth = Number(document.getElementById('sheetTotalWidth').value) || 0;
     const sheetTotalLength = Number(document.getElementById('sheetTotalLength').value) || 0;
     const sideLap = Number(document.getElementById('sideLap').value) || 0;
@@ -485,12 +568,6 @@ function updateEstimate() {
 
     document.getElementById('sheetPrice').value = Math.round(sheetPrice);
 
-    const planLength = Math.max(0, length + eaves * 2);
-    const planWidth = Math.max(0, width + eaves * 2);
-    const footprint = planLength * planWidth;
-    const slopeMultiplier = pitch > 0 ? 1 / Math.cos(pitch * Math.PI / 180) : 1;
-    const roofArea = footprint ? footprint * getTypeFactor(roofType) * slopeMultiplier : 0;
-
     let effectiveSheetArea = 0;
     if (sheetTotalWidth > 0 && sheetTotalLength > 0) {
         const effectiveSheetWidth = Math.max(0, sheetTotalWidth - sideLap);
@@ -500,7 +577,6 @@ function updateEstimate() {
     if (!effectiveSheetArea) {
         effectiveSheetArea = coverWidth;
     }
-    const baseSheets = effectiveSheetArea ? roofArea / effectiveSheetArea : 0;
     const wastage = getWastage(roofType);
     const recommendedSheets = Math.max(0, Math.ceil(baseSheets * (1 + wastage)));
     const ridgeLength = getRidgeLength(roofType, length, width);
