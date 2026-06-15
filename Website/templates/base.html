@@ -7,14 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
     <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
-    <link rel="icon" type="image/png" href="{% block favicon %}{% static 'images/logo.png' %}?v=2{% endblock %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo.png' %}?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo.png' %}?v=2">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo.png' %}?v=2">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="{% block favicon %}{% static 'images/logo.png' %}?v=3{% endblock %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo.png' %}?v=3">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo.png' %}?v=3">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo.png' %}?v=3">
     <link rel="manifest" href="{% static 'site.webmanifest' %}">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="{% static 'images/logo.png' %}?v=2">
+    <meta name="msapplication-TileImage" content="{% static 'images/logo.png' %}?v=3">
     <meta name="description" content="{% block meta_description %}Compare mabati prices, roofing sheets and roofing suppliers across Kenya. Find quality roofing materials, steel doors and roofing cost calculators at Mabati Hub Kenya.{% endblock %}">
     <meta name="keywords" content="{% block meta_keywords %}mabati kenya, roofing sheets kenya, mabati prices kenya, roofing materials kenya, steel doors kenya, decra kenya{% endblock %}">
     <meta property="og:title" content="{% block og_title %}Mabati Hub Kenya{% endblock %}">
