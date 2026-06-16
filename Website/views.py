@@ -142,6 +142,7 @@ def roof_calculator(request):
     profiles = RoofingProfile.objects.order_by('order', 'name')
     gauges = RoofGauge.objects.order_by('order', 'name')
     color_variants = ColorVariant.objects.order_by('name')
+    products = Product.objects.order_by('name').prefetch_related('gauge_variants__gauge')
 
     initial_data = {
         'length': '50',
@@ -149,6 +150,8 @@ def roof_calculator(request):
         'roofType': 'Gable Roof',
         'pitch': '25',
         'profile': str(profiles.first().pk) if profiles.exists() else '',
+        'product': '',
+        'productVariant': '',
         'gauge': str(gauges.first().pk) if gauges.exists() else '',
         'color': 'Charcoal Grey',
         'calculationMethod': 'dimensions',
@@ -181,10 +184,22 @@ def roof_calculator(request):
         initial_data.update(post_data)
 
         profile = RoofingProfile.objects.filter(pk=request.POST.get('profile')).first()
+        selected_product = Product.objects.filter(pk=request.POST.get('product')).prefetch_related('gauge_variants__gauge').first() if request.POST.get('product') else None
+        selected_variant = None
+        if selected_product and request.POST.get('productVariant'):
+            selected_variant = selected_product.gauge_variants.filter(pk=request.POST.get('productVariant')).select_related('gauge').first()
+
         gauge = RoofGauge.objects.filter(pk=request.POST.get('gauge')).first()
 
         sheet_price = Decimal('0')
-        if profile and gauge:
+        if selected_variant:
+            sheet_price = selected_variant.price
+            gauge = selected_variant.gauge
+            initial_data['sheetPrice'] = str(sheet_price)
+            initial_data['product'] = str(selected_product.pk)
+            initial_data['productVariant'] = str(selected_variant.pk)
+            initial_data['gauge'] = str(gauge.pk)
+        elif profile and gauge:
             sheet_price = (profile.default_sheet_price * gauge.price_multiplier) + gauge.additional_cost
             initial_data['sheetPrice'] = str(sheet_price)
         else:
@@ -312,6 +327,7 @@ def roof_calculator(request):
         'current_page': 'roof_calculator',
         'profiles': profiles,
         'gauges': gauges,
+        'products': products,
         'color_variants': color_variants,
         'initial_data': initial_data,
         'quote_saved': quote_saved,

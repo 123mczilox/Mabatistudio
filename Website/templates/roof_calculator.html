@@ -138,7 +138,22 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-6">
+                            <div class="col-12">
+                                <label for="product" class="form-label">Product (optional)</label>
+                                <select id="product" name="product" class="form-select">
+                                    <option value="">Use generic profile and gauge</option>
+                                    {% for product in products %}
+                                        <option value="{{ product.pk }}" {% if initial_data.product == product.pk|stringformat:"s" %}selected{% endif %}>{{ product.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-6" id="productVariantWrapper" style="display:none;">
+                                <label for="productVariant" class="form-label">Product Gauge Variant</label>
+                                <select id="productVariant" name="productVariant" class="form-select">
+                                    <option value="">Select a product to load variants</option>
+                                </select>
+                            </div>
+                            <div class="col-6" id="profileWrapper">
                                 <label for="profile" class="form-label">Roofing Profile</label>
                                 <select id="profile" name="profile" class="form-select">
                                     {% if profiles %}
@@ -150,7 +165,7 @@
                                     {% endif %}
                                 </select>
                             </div>
-                            <div class="col-6">
+                            <div class="col-6" id="gaugeWrapper">
                                 <label for="gauge" class="form-label">Gauge</label>
                                 <select id="gauge" name="gauge" class="form-select">
                                     {% if gauges %}
@@ -423,6 +438,67 @@
 <script>
 const numberFormat = new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 });
 
+const productGaugeVariants = {
+    {% for product in products %}
+    "{{ product.pk }}": [
+        {% for variant in product.gauge_variants.all %}
+        {
+            id: "{{ variant.pk }}",
+            gaugeId: "{{ variant.gauge.pk }}",
+            name: "{{ variant.gauge.name|escapejs }}",
+            finish: "{{ variant.finish_type|default:'Standard'|escapejs }}",
+            price: "{{ variant.price }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]{% if not forloop.last %},{% endif %}
+    {% endfor %}
+};
+
+function updateProductVariantOptions() {
+    const productSelect = document.getElementById('product');
+    const variantWrapper = document.getElementById('productVariantWrapper');
+    const variantSelect = document.getElementById('productVariant');
+    const selectedProduct = productSelect.value;
+
+    if (!selectedProduct || !productGaugeVariants[selectedProduct] || productGaugeVariants[selectedProduct].length === 0) {
+        variantWrapper.style.display = 'none';
+        variantSelect.innerHTML = '<option value="">Select a product to load variants</option>';
+        const gaugeWrapper = document.getElementById('gaugeWrapper');
+        gaugeWrapper.style.display = 'block';
+        document.getElementById('gauge').disabled = false;
+        return;
+    }
+
+    variantWrapper.style.display = 'block';
+    const gaugeWrapper = document.getElementById('gaugeWrapper');
+    gaugeWrapper.style.display = 'none';
+    document.getElementById('gauge').disabled = true;
+    variantSelect.innerHTML = '<option value="">Choose variant</option>';
+
+    const selectedVariantId = "{{ initial_data.productVariant }}";
+    productGaugeVariants[selectedProduct].forEach(variant => {
+        const option = document.createElement('option');
+        option.value = variant.id;
+        option.dataset.gaugeId = variant.gaugeId;
+        option.dataset.price = variant.price;
+        option.text = `${variant.name} — ${variant.finish} — KES ${Number(variant.price).toLocaleString('en-KE')}`;
+        if (selectedVariantId === variant.id) {
+            option.selected = true;
+        }
+        variantSelect.appendChild(option);
+    });
+}
+
+function getSelectedProductVariantOption() {
+    const select = document.getElementById('productVariant');
+    return select && select.options[select.selectedIndex];
+}
+
+function getSelectedProductOption() {
+    const select = document.getElementById('product');
+    return select && select.options[select.selectedIndex];
+}
+
 // Toggle between dimensions and direct area modes
 document.querySelectorAll('input[name="calculationMethod"]').forEach(radio => {
     radio.addEventListener('change', function() {
@@ -550,11 +626,19 @@ function updateEstimate() {
     const endOverhang = Number(document.getElementById('endOverhang').value) || 0;
     const profileOption = getSelectedProfileOption();
     const gaugeOption = getSelectedGaugeOption();
+    const productVariantOption = getSelectedProductVariantOption();
     const baseSheetPrice = Number(profileOption?.dataset.sheetPrice || 0);
     const coverWidth = getCoverWidth(profileOption);
-    const gaugeMultiplier = Number(gaugeOption?.dataset.priceMultiplier || 1.0);
-    const gaugeAdditionalCost = Number(gaugeOption?.dataset.additionalCost || 0);
-    const sheetPrice = baseSheetPrice ? baseSheetPrice * gaugeMultiplier + gaugeAdditionalCost : Number(document.getElementById('sheetPrice').value) || 0;
+    let sheetPrice = 0;
+
+    if (productVariantOption && productVariantOption.value) {
+        sheetPrice = Number(productVariantOption.dataset.price || 0);
+    } else {
+        const gaugeMultiplier = Number(gaugeOption?.dataset.priceMultiplier || 1.0);
+        const gaugeAdditionalCost = Number(gaugeOption?.dataset.additionalCost || 0);
+        sheetPrice = baseSheetPrice ? baseSheetPrice * gaugeMultiplier + gaugeAdditionalCost : Number(document.getElementById('sheetPrice').value) || 0;
+    }
+
     const ridgePrice = Number(document.getElementById('ridgePrice').value) || 0;
     const screwPrice = Number(document.getElementById('screwPrice').value) || 0;
     const nailPrice = Number(document.getElementById('nailPrice').value) || 0;
@@ -704,6 +788,19 @@ formFields.forEach((field) => {
     element.addEventListener('change', updateEstimate);
 });
 
+const productSelect = document.getElementById('product');
+const productVariantSelect = document.getElementById('productVariant');
+if (productSelect) {
+    productSelect.addEventListener('change', () => {
+        updateProductVariantOptions();
+        updateEstimate();
+    });
+}
+if (productVariantSelect) {
+    productVariantSelect.addEventListener('change', updateEstimate);
+}
+
+updateProductVariantOptions();
 updateEstimate();
 </script>
 {% endblock %}
