@@ -812,10 +812,16 @@ updateEstimate();
 function buildQueryString() {
     const params = new URLSearchParams();
     formFields.forEach((name) => {
-        const element = document.getElementById(name);
+        let element = document.getElementById(name);
+        if (!element) {
+            element = document.querySelector(`[name="${name}"]`);
+        }
         if (!element) return;
         if (element.type === 'checkbox') {
             params.set(name, element.checked ? 'on' : 'off');
+        } else if (element.type === 'radio') {
+            const checked = document.querySelector(`[name="${name}"]:checked`);
+            params.set(name, checked ? checked.value : '');
         } else {
             params.set(name, element.value || '');
         }
