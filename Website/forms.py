@@ -39,22 +39,3 @@ class QuoteRequestForm(forms.ModelForm):
                 'placeholder': 'Additional notes or special requirements',
             }),
         }
-        widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Your full name',
-            }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'you@example.com',
-            }),
-            'phone': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Optional phone number',
-            }),
-            'message': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 5,
-                'placeholder': 'Tell us about your roofing needs',
-            }),
-        }

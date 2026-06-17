@@ -328,15 +328,18 @@ def request_quote(request):
             key: request.POST.get(key, hidden_data[key])
             for key in hidden_data
         })
-        estimate = calculate_estimate_values(hidden_data, profile=RoofingProfile.objects.filter(pk=request.POST.get('profile')).first())
+        profile_id = request.POST.get('profile')
+        profile = RoofingProfile.objects.filter(pk=profile_id).first() if profile_id else None
+        estimate = calculate_estimate_values(hidden_data, profile=profile)
 
         if form.is_valid():
             quote = form.save(commit=False)
             quote.session_key = get_session_key(request)
             quote.calculation_method = request.POST.get('calculationMethod', 'dimensions')
             quote.roof_type = request.POST.get('roofType', 'Gable Roof')
-            quote.profile = RoofingProfile.objects.filter(pk=request.POST.get('profile')).first()
-            quote.gauge = RoofGauge.objects.filter(pk=request.POST.get('gauge')).first()
+            quote.profile = profile
+            gauge_id = request.POST.get('gauge')
+            quote.gauge = RoofGauge.objects.filter(pk=gauge_id).first() if gauge_id else None
             quote.color = request.POST.get('color', '').strip()
             quote.length = parse_decimal(request.POST.get('length', '0'))
             quote.width = parse_decimal(request.POST.get('width', '0'))
@@ -373,7 +376,9 @@ def request_quote(request):
             return redirect('quote_confirmation', quote_number=quote.quote_number)
     else:
         form = QuoteRequestForm()
-        estimate = calculate_estimate_values(hidden_data, profile=RoofingProfile.objects.filter(pk=hidden_data.get('profile')).first())
+        profile_id = hidden_data.get('profile')
+        profile = RoofingProfile.objects.filter(pk=profile_id).first() if profile_id else None
+        estimate = calculate_estimate_values(hidden_data, profile=profile)
 
     return render(request, 'quote_request.html', {
         'current_page': 'roof_calculator',
