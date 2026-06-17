@@ -34,7 +34,7 @@
             <div class="col-lg-7 hero-copy">
                 <span class="badge rounded-pill mb-3">Free Roof Estimate</span>
                 <h1 class="display-5 fw-bold mb-3">Calculate roof materials and costs in seconds.</h1>
-                <p class="lead text-white-75 mb-4">Enter your building dimensions, choose the roof type, profile, gauge and the system will estimate area, sheets, ridge caps, screws, nails, timber and total cost.<br><a href="{% url 'quote_history' %}" class="text-warning text-decoration-underline">View my saved estimates</a></p>
+                <p class="lead text-white-75 mb-4">Enter your building dimensions, choose the roof type, profile, gauge and the system will estimate area, sheets, ridge caps, screws, nails, timber and total cost.</p>
                 <a href="#estimate-form" class="btn btn-outline-light btn-lg me-3">Start Estimate</a>
                 <a href="{% url 'contact' %}" class="btn btn-light btn-lg">Request Support</a>
             </div>
@@ -370,9 +370,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-4 d-flex gap-3 flex-wrap">
-                                    <button type="submit" class="btn btn-primary btn-lg">Request Official Quote</button>
+                                <div class="mt-4 d-flex gap-2 flex-wrap">
+                                    <button type="button" id="requestQuoteBtn" class="btn btn-primary btn-lg">Request Official Quote</button>
                                 </div>
+                                <p class="text-muted small mt-3">Once your roof estimate is ready, continue to the quote request form to submit your project details.</p>
                             </div>
                         </div>
                     </div>
@@ -540,7 +541,7 @@ function validateForm() {
 }
 
 const formFields = [
-    'length', 'width', 'eaves', 'roofType', 'pitch', 'profile', 'gauge', 'color', 'calculationMethod', 'directArea',
+    'length', 'width', 'eaves', 'roofType', 'pitch', 'profile', 'product', 'productVariant', 'gauge', 'color', 'calculationMethod', 'directArea',
     'sheetTotalWidth', 'sheetTotalLength', 'sideLap', 'endLap', 'endOverhang',
     'sheetPrice', 'ridgePrice', 'screwPrice', 'nailPrice', 'timberPrice', 'labourCost', 'rainfall',
     'includeScrews', 'includeNails', 'includeTimber', 'includeRainwater'
@@ -553,6 +554,11 @@ function getSelectedProfileOption() {
 
 function getSelectedGaugeOption() {
     const select = document.getElementById('gauge');
+    return select && select.options[select.selectedIndex];
+}
+
+function getSelectedProductVariantOption() {
+    const select = document.getElementById('productVariant');
     return select && select.options[select.selectedIndex];
 }
 
@@ -802,5 +808,32 @@ if (productVariantSelect) {
 
 updateProductVariantOptions();
 updateEstimate();
+
+function buildQueryString() {
+    const params = new URLSearchParams();
+    formFields.forEach((name) => {
+        const element = document.getElementById(name);
+        if (!element) return;
+        if (element.type === 'checkbox') {
+            params.set(name, element.checked ? 'on' : 'off');
+        } else {
+            params.set(name, element.value || '');
+        }
+    });
+    return params.toString();
+}
+
+function goToRequestQuote() {
+    if (!validateForm()) {
+        return;
+    }
+    const query = buildQueryString();
+    window.location.href = '{% url "request_quote" %}?' + query;
+}
+
+const requestQuoteBtn = document.getElementById('requestQuoteBtn');
+if (requestQuoteBtn) {
+    requestQuoteBtn.addEventListener('click', goToRequestQuote);
+}
 </script>
 {% endblock %}

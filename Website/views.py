@@ -16,7 +16,7 @@ from .models import (
     RoofGauge,
     RoofEstimate,
 )
-from .forms import ContactForm
+from .forms import ContactForm, QuoteRequestForm
 from django.core.paginator import Paginator
 
 # Static/simple views
@@ -104,6 +104,87 @@ def parse_decimal(value, default=Decimal('0')):
         return default
 
 
+def calculate_estimate_values(data, profile=None):
+    length = parse_decimal(data.get('length', '0'))
+    width = parse_decimal(data.get('width', '0'))
+    eaves = parse_decimal(data.get('eaves', '0'))
+    pitch = parse_decimal(data.get('pitch', '0'))
+    calculation_method = data.get('calculationMethod', 'dimensions')
+    direct_area = parse_decimal(data.get('directArea', '0'))
+    roof_type = data.get('roofType', 'Gable Roof')
+
+    if calculation_method == 'direct_area':
+        roof_area = direct_area
+    else:
+        plan_length = float(length + eaves * 2)
+        plan_width = float(width + eaves * 2)
+        footprint = plan_length * plan_width
+        slope_multiplier = 1 / math.cos(math.radians(float(pitch))) if float(pitch) > 0 else 1
+        roof_area = Decimal(str(footprint * get_type_factor(roof_type) * slope_multiplier))
+
+    sheet_total_width = parse_decimal(data.get('sheetTotalWidth', '0'))
+    sheet_total_length = parse_decimal(data.get('sheetTotalLength', '0'))
+    side_lap = parse_decimal(data.get('sideLap', '0'))
+    end_lap = parse_decimal(data.get('endLap', '0'))
+    end_overhang = parse_decimal(data.get('endOverhang', '0'))
+    sheet_price = parse_decimal(data.get('sheetPrice', '0'))
+    ridge_price = parse_decimal(data.get('ridgePrice', '0'))
+    screw_price = parse_decimal(data.get('screwPrice', '0'))
+    nail_price = parse_decimal(data.get('nailPrice', '0'))
+    timber_price = parse_decimal(data.get('timberPrice', '0'))
+    labour_cost = parse_decimal(data.get('labourCost', '0'))
+    rainfall = parse_decimal(data.get('rainfall', '0'))
+    include_screws = data.get('includeScrews') == 'on'
+    include_nails = data.get('includeNails') == 'on'
+    include_timber = data.get('includeTimber') == 'on'
+    include_rainwater = data.get('includeRainwater') == 'on'
+
+    effective_sheet_area = Decimal('0')
+    if sheet_total_width > 0 and sheet_total_length > 0:
+        effective_sheet_width = max(Decimal('0'), sheet_total_width - side_lap)
+        effective_sheet_length = max(Decimal('0'), sheet_total_length - end_lap - end_overhang)
+        effective_sheet_area = effective_sheet_width * effective_sheet_length
+
+    if effective_sheet_area <= 0:
+        if profile and profile.cover_width:
+            effective_sheet_area = parse_decimal(profile.cover_width)
+        else:
+            effective_sheet_area = Decimal('1')
+
+    base_sheets = float(roof_area) / float(effective_sheet_area) if effective_sheet_area else 0
+    wastage = get_wastage(roof_type)
+    recommended_sheets = max(0, int(math.ceil(base_sheets * (1 + wastage))))
+    ridge_length = get_ridge_length(roof_type, float(length), float(width))
+    ridge_caps = max(0, int(math.ceil(ridge_length / 2)))
+    screws = max(0, int(math.ceil(float(roof_area) * 9))) if include_screws else 0
+    nails = max(0, int(math.ceil(float(roof_area) * 6))) if include_nails else 0
+    timber_length = Decimal(str(math.ceil(float(roof_area) * get_timber_factor(roof_type)))) if include_timber else Decimal('0')
+    rainwater_litres = Decimal(str(round(float(roof_area) * float(rainfall) * 0.8))) if include_rainwater else Decimal('0')
+
+    material_cost = (Decimal(recommended_sheets) * sheet_price) + (Decimal(ridge_caps) * ridge_price)
+    if include_screws:
+        material_cost += Decimal(screws) * screw_price
+    if include_nails:
+        material_cost += Decimal(nails) * nail_price
+    if include_timber:
+        material_cost += timber_length * timber_price
+
+    grand_total = material_cost + labour_cost
+
+    return {
+        'roof_area': roof_area,
+        'recommended_sheets': recommended_sheets,
+        'ridge_caps': ridge_caps,
+        'screws': screws,
+        'nails': nails,
+        'timber_length': timber_length,
+        'rainwater_litres': rainwater_litres,
+        'material_cost': material_cost,
+        'labour_cost': labour_cost,
+        'grand_total': grand_total,
+    }
+
+
 def get_type_factor(roof_type):
     return {
         'Gable Roof': 1.00,
@@ -174,151 +255,13 @@ def roof_calculator(request):
         'endLap': '0.10',
         'endOverhang': '0.10',
     }
-    quote_saved = None
 
-    if request.method == 'POST':
-        if not request.session.session_key:
-            request.session.create()
-
-        post_data = request.POST.dict()
-        initial_data.update(post_data)
-
-        profile = RoofingProfile.objects.filter(pk=request.POST.get('profile')).first()
-        selected_product = Product.objects.filter(pk=request.POST.get('product')).prefetch_related('gauge_variants__gauge').first() if request.POST.get('product') else None
-        selected_variant = None
-        if selected_product and request.POST.get('productVariant'):
-            selected_variant = selected_product.gauge_variants.filter(pk=request.POST.get('productVariant')).select_related('gauge').first()
-
-        gauge = RoofGauge.objects.filter(pk=request.POST.get('gauge')).first()
-
-        sheet_price = Decimal('0')
-        if selected_variant:
-            sheet_price = selected_variant.price
-            gauge = selected_variant.gauge
-            initial_data['sheetPrice'] = str(sheet_price)
-            initial_data['product'] = str(selected_product.pk)
-            initial_data['productVariant'] = str(selected_variant.pk)
-            initial_data['gauge'] = str(gauge.pk)
-        elif profile and gauge:
-            sheet_price = (profile.default_sheet_price * gauge.price_multiplier) + gauge.additional_cost
-            initial_data['sheetPrice'] = str(sheet_price)
-        else:
-            sheet_price = parse_decimal(request.POST.get('sheetPrice', '0'))
-
-        ridge_price = parse_decimal(request.POST.get('ridgePrice', '0'))
-        screw_price = parse_decimal(request.POST.get('screwPrice', '0'))
-        nail_price = parse_decimal(request.POST.get('nailPrice', '0'))
-        timber_price = parse_decimal(request.POST.get('timberPrice', '0'))
-        labour_cost = parse_decimal(request.POST.get('labourCost', '0'))
-        rainfall = parse_decimal(request.POST.get('rainfall', '0'))
-        length = parse_decimal(request.POST.get('length', '0'))
-        width = parse_decimal(request.POST.get('width', '0'))
-        pitch = parse_decimal(request.POST.get('pitch', '0'))
-        calculation_method = request.POST.get('calculationMethod', 'dimensions')
-        direct_area = parse_decimal(request.POST.get('directArea', '0'))
-        roof_type = request.POST.get('roofType', 'Gable Roof')
-        color = request.POST.get('color', '').strip()
-        include_screws = request.POST.get('includeScrews') == 'on'
-        include_nails = request.POST.get('includeNails') == 'on'
-        include_timber = request.POST.get('includeTimber') == 'on'
-        include_rainwater = request.POST.get('includeRainwater') == 'on'
-        eaves = parse_decimal(request.POST.get('eaves', '0'))
-        sheet_total_width = parse_decimal(request.POST.get('sheetTotalWidth', '0'))
-        sheet_total_length = parse_decimal(request.POST.get('sheetTotalLength', '0'))
-        side_lap = parse_decimal(request.POST.get('sideLap', '0'))
-        end_lap = parse_decimal(request.POST.get('endLap', '0'))
-        end_overhang = parse_decimal(request.POST.get('endOverhang', '0'))
-
-        initial_data.update({
-            'eaves': str(eaves),
-            'sheetTotalWidth': str(sheet_total_width),
-            'sheetTotalLength': str(sheet_total_length),
-            'sideLap': str(side_lap),
-            'endLap': str(end_lap),
-            'endOverhang': str(end_overhang),
-            'calculationMethod': calculation_method,
-            'directArea': str(direct_area),
-        })
-
-        # Calculate roof area based on method
-        if calculation_method == 'direct_area':
-            # User provided area directly in square meters
-            roof_area = direct_area
-        else:
-            # Calculate from dimensions
-            plan_length = float(length + eaves * 2)
-            plan_width = float(width + eaves * 2)
-            footprint = plan_length * plan_width
-            slope_multiplier = 1 / math.cos(math.radians(float(pitch))) if float(pitch) > 0 else 1
-            roof_area = Decimal(str(footprint * get_type_factor(roof_type) * slope_multiplier))
-
-        effective_sheet_area = 0
-        if sheet_total_width > 0 and sheet_total_length > 0:
-            effective_sheet_width = max(0.0, float(sheet_total_width - side_lap))
-            effective_sheet_length = max(0.0, float(sheet_total_length - end_lap - end_overhang))
-            effective_sheet_area = effective_sheet_width * effective_sheet_length
-        if effective_sheet_area <= 0:
-            effective_sheet_area = float(profile.cover_width) if profile and profile.cover_width else 1.0
-
-        base_sheets = float(roof_area) / effective_sheet_area if effective_sheet_area else 0
-        recommended_sheets = max(0, int((base_sheets * (1 + get_wastage(roof_type))) // 1 + (1 if (base_sheets * (1 + get_wastage(roof_type))) % 1 else 0)))
-        ridge_length = get_ridge_length(roof_type, float(length), float(width))
-        ridge_caps = max(0, int((ridge_length / 2) // 1 + (1 if (ridge_length / 2) % 1 else 0)))
-        screws = max(0, int(math.ceil(float(roof_area) * 9))) if include_screws else 0
-        nails = max(0, int(math.ceil(float(roof_area) * 6))) if include_nails else 0
-        timber_length = Decimal(str(math.ceil(float(roof_area) * get_timber_factor(roof_type)))) if include_timber else Decimal('0')
-        rainwater_litres = Decimal(str(round(float(roof_area) * float(rainfall) * 0.8))) if include_rainwater else Decimal('0')
-
-        material_cost = (Decimal(recommended_sheets) * sheet_price) + (Decimal(ridge_caps) * ridge_price)
-        if include_screws:
-            material_cost += Decimal(screws) * screw_price
-        if include_nails:
-            material_cost += Decimal(nails) * nail_price
-        if include_timber:
-            material_cost += timber_length * timber_price
-
-        grand_total = material_cost + labour_cost
-
-        quote_saved = RoofEstimate.objects.create(
-            session_key=request.session.session_key,
-            calculation_method=calculation_method,
-            roof_type=roof_type,
-            profile=profile,
-            gauge=gauge,
-            color=color,
-            length=length,
-            width=width,
-            direct_area=direct_area,
-            pitch=pitch,
-            include_screws=include_screws,
-            include_nails=include_nails,
-            include_timber=include_timber,
-            include_rainwater=include_rainwater,
-            rainfall=rainfall,
-            roof_area=roof_area,
-            recommended_sheets=recommended_sheets,
-            ridge_caps=ridge_caps,
-            screws=screws,
-            nails=nails,
-            timber_length=timber_length,
-            rainwater_litres=rainwater_litres,
-            eaves=eaves,
-            sheet_total_width=sheet_total_width,
-            sheet_total_length=sheet_total_length,
-            side_lap=side_lap,
-            end_lap=end_lap,
-            end_overhang=end_overhang,
-            sheet_price=sheet_price,
-            ridge_price=ridge_price,
-            screw_price=screw_price,
-            nail_price=nail_price,
-            timber_price=timber_price,
-            labour_cost=labour_cost,
-            material_cost=material_cost,
-            grand_total=grand_total,
-        )
-
-        messages.success(request, f'Official quote saved: {quote_saved.quote_number}')
+    if request.GET:
+        for key in list(initial_data.keys()):
+            if key in request.GET:
+                initial_data[key] = request.GET.get(key, initial_data[key])
+        for checkbox in ['includeScrews', 'includeNails', 'includeTimber', 'includeRainwater']:
+            initial_data[checkbox] = 'on' if request.GET.get(checkbox) == 'on' else 'off'
 
     roof_types = ['Gable Roof', 'Hip Roof', 'Mono-Pitch Roof', 'Flat Roof']
     pitch_options = ['15', '20', '25', '30', '35', '40']
@@ -330,9 +273,124 @@ def roof_calculator(request):
         'products': products,
         'color_variants': color_variants,
         'initial_data': initial_data,
-        'quote_saved': quote_saved,
         'roof_types': roof_types,
         'pitch_options': pitch_options,
+    })
+
+
+def request_quote(request):
+    profiles = RoofingProfile.objects.order_by('order', 'name')
+    gauges = RoofGauge.objects.order_by('order', 'name')
+    products = Product.objects.order_by('name').prefetch_related('gauge_variants__gauge')
+
+    default_data = {
+        'length': '50',
+        'width': '100',
+        'roofType': 'Gable Roof',
+        'pitch': '25',
+        'profile': str(profiles.first().pk) if profiles.exists() else '',
+        'product': '',
+        'productVariant': '',
+        'gauge': str(gauges.first().pk) if gauges.exists() else '',
+        'color': 'Charcoal Grey',
+        'calculationMethod': 'dimensions',
+        'directArea': '0',
+        'sheetPrice': '1800',
+        'ridgePrice': '800',
+        'screwPrice': '5',
+        'nailPrice': '3',
+        'timberPrice': '250',
+        'labourCost': '25000',
+        'rainfall': '1200',
+        'includeScrews': 'off',
+        'includeNails': 'off',
+        'includeTimber': 'off',
+        'includeRainwater': 'off',
+        'eaves': '0.10',
+        'sheetTotalWidth': '1.05',
+        'sheetTotalLength': '3.05',
+        'sideLap': '0.05',
+        'endLap': '0.10',
+        'endOverhang': '0.10',
+    }
+
+    hidden_data = default_data.copy()
+    if request.method == 'GET' and request.GET:
+        for key in hidden_data:
+            if key in request.GET:
+                hidden_data[key] = request.GET.get(key, hidden_data[key])
+        for checkbox in ['includeScrews', 'includeNails', 'includeTimber', 'includeRainwater']:
+            hidden_data[checkbox] = 'on' if request.GET.get(checkbox) == 'on' else 'off'
+
+    if request.method == 'POST':
+        form = QuoteRequestForm(request.POST)
+        hidden_data.update({
+            key: request.POST.get(key, hidden_data[key])
+            for key in hidden_data
+        })
+        estimate = calculate_estimate_values(hidden_data, profile=RoofingProfile.objects.filter(pk=request.POST.get('profile')).first())
+
+        if form.is_valid():
+            quote = form.save(commit=False)
+            quote.session_key = get_session_key(request)
+            quote.calculation_method = request.POST.get('calculationMethod', 'dimensions')
+            quote.roof_type = request.POST.get('roofType', 'Gable Roof')
+            quote.profile = RoofingProfile.objects.filter(pk=request.POST.get('profile')).first()
+            quote.gauge = RoofGauge.objects.filter(pk=request.POST.get('gauge')).first()
+            quote.color = request.POST.get('color', '').strip()
+            quote.length = parse_decimal(request.POST.get('length', '0'))
+            quote.width = parse_decimal(request.POST.get('width', '0'))
+            quote.direct_area = parse_decimal(request.POST.get('directArea', '0'))
+            quote.pitch = parse_decimal(request.POST.get('pitch', '0'))
+            quote.include_screws = request.POST.get('includeScrews') == 'on'
+            quote.include_nails = request.POST.get('includeNails') == 'on'
+            quote.include_timber = request.POST.get('includeTimber') == 'on'
+            quote.include_rainwater = request.POST.get('includeRainwater') == 'on'
+            quote.rainfall = parse_decimal(request.POST.get('rainfall', '0'))
+            quote.roof_area = estimate['roof_area']
+            quote.recommended_sheets = estimate['recommended_sheets']
+            quote.ridge_caps = estimate['ridge_caps']
+            quote.screws = estimate['screws']
+            quote.nails = estimate['nails']
+            quote.timber_length = estimate['timber_length']
+            quote.rainwater_litres = estimate['rainwater_litres']
+            quote.eaves = parse_decimal(request.POST.get('eaves', '0'))
+            quote.sheet_total_width = parse_decimal(request.POST.get('sheetTotalWidth', '0'))
+            quote.sheet_total_length = parse_decimal(request.POST.get('sheetTotalLength', '0'))
+            quote.side_lap = parse_decimal(request.POST.get('sideLap', '0'))
+            quote.end_lap = parse_decimal(request.POST.get('endLap', '0'))
+            quote.end_overhang = parse_decimal(request.POST.get('endOverhang', '0'))
+            quote.sheet_price = parse_decimal(request.POST.get('sheetPrice', '0'))
+            quote.ridge_price = parse_decimal(request.POST.get('ridgePrice', '0'))
+            quote.screw_price = parse_decimal(request.POST.get('screwPrice', '0'))
+            quote.nail_price = parse_decimal(request.POST.get('nailPrice', '0'))
+            quote.timber_price = parse_decimal(request.POST.get('timberPrice', '0'))
+            quote.labour_cost = parse_decimal(request.POST.get('labourCost', '0'))
+            quote.material_cost = estimate['material_cost']
+            quote.grand_total = estimate['grand_total']
+            quote.status = 'requested'
+            quote.save()
+            return redirect('quote_confirmation', quote_number=quote.quote_number)
+    else:
+        form = QuoteRequestForm()
+        estimate = calculate_estimate_values(hidden_data, profile=RoofingProfile.objects.filter(pk=hidden_data.get('profile')).first())
+
+    return render(request, 'quote_request.html', {
+        'current_page': 'roof_calculator',
+        'form': form,
+        'hidden_data': hidden_data,
+        'estimate': estimate,
+        'roof_types': ['Gable Roof', 'Hip Roof', 'Mono-Pitch Roof', 'Flat Roof'],
+        'pitch_options': ['15', '20', '25', '30', '35', '40'],
+    })
+
+
+def quote_confirmation(request, quote_number):
+    session_key = get_session_key(request)
+    quote = get_object_or_404(RoofEstimate, quote_number=quote_number, session_key=session_key)
+    return render(request, 'quote_confirmation.html', {
+        'current_page': 'roof_calculator',
+        'quote': quote,
     })
 
 
@@ -340,24 +398,6 @@ def get_session_key(request):
     if not request.session.session_key:
         request.session.create()
     return request.session.session_key
-
-
-def quote_history(request):
-    session_key = get_session_key(request)
-    quotes = RoofEstimate.objects.filter(session_key=session_key).order_by('-created_at')
-    return render(request, 'roof_history.html', {
-        'current_page': 'history',
-        'quotes': quotes,
-    })
-
-
-def quote_detail(request, quote_number):
-    session_key = get_session_key(request)
-    quote = get_object_or_404(RoofEstimate, quote_number=quote_number, session_key=session_key)
-    return render(request, 'roof_estimate_detail.html', {
-        'current_page': 'history',
-        'quote': quote,
-    })
 
 
 def about(request):

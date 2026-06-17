@@ -257,9 +257,11 @@ class ProductGaugeVariant(models.Model):
 
 class RoofEstimate(models.Model):
     STATUS_CHOICES = [
-        ('requested', 'Requested'),
-        ('sent', 'Sent'),
+        ('requested', 'Pending Review'),
+        ('in_progress', 'In Progress'),
+        ('quote_ready', 'Quote Ready'),
         ('approved', 'Approved'),
+        ('expired', 'Expired'),
     ]
     
     CALCULATION_METHODS = [
@@ -269,6 +271,12 @@ class RoofEstimate(models.Model):
 
     quote_number = models.CharField(max_length=40, unique=True, blank=True)
     session_key = models.CharField(max_length=40, blank=True, null=True)
+    customer_full_name = models.CharField(max_length=200, blank=True)
+    customer_phone = models.CharField(max_length=30, blank=True)
+    customer_email = models.EmailField(blank=True)
+    project_location = models.CharField(max_length=250, blank=True)
+    project_county = models.CharField(max_length=100, blank=True)
+    customer_notes = models.TextField(blank=True)
     calculation_method = models.CharField(max_length=20, choices=CALCULATION_METHODS, default='dimensions')
     roof_type = models.CharField(max_length=100)
     profile = models.ForeignKey(RoofingProfile, on_delete=models.SET_NULL, null=True)

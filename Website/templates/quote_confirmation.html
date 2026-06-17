@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quote Submitted - MabatiHubKenya{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="card shadow-sm rounded-4 p-5 border-0">
+            <div class="text-center mb-4">
+                <div class="display-4 text-success">✓</div>
+                <h1 class="display-6 fw-bold">Quote Request Submitted Successfully</h1>
+                <p class="text-muted">Your official quote request has been received.</p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm p-4">
+                        <div class="mb-3 text-center">
+                            <span class="badge bg-primary py-2 px-3 rounded-pill">Reference Number</span>
+                            <div class="fs-4 fw-bold mt-3">{{ quote.quote_number }}</div>
+                        </div>
+                        <p class="text-muted">Our sales team will review your estimate and contact you within 24 hours. Keep this reference safe for tracking.</p>
+                        <div class="d-grid gap-3 mt-4">
+                            <a href="{% url 'roof_calculator' %}" class="btn btn-primary btn-lg">Return to Calculator</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-5">
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm p-4">
+                        <h4 class="h6 mb-3">What Happens Next?</h4>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Sales review your estimate.</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>We prepare an official quote.</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Your official quote will be emailed once ready.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm p-4 bg-light">
+                        <h4 class="h6 mb-3">Your Submitted Quote</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <p class="text-secondary mb-1">Name</p>
+                                <p class="fw-semibold mb-0">{{ quote.customer_full_name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="text-secondary mb-1">Phone</p>
+                                <p class="fw-semibold mb-0">{{ quote.customer_phone }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="text-secondary mb-1">Email</p>
+                                <p class="fw-semibold mb-0">{{ quote.customer_email }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="text-secondary mb-1">Location</p>
+                                <p class="fw-semibold mb-0">{{ quote.project_location }}, {{ quote.project_county }}</p>
+                            </div>
+                            <div class="col-12">
+                                <p class="text-secondary mb-1">Estimate Total</p>
+                                <p class="fw-semibold fs-4 mb-0">KES {{ quote.grand_total|floatformat:0 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

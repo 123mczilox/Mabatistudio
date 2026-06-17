@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Request Official Quote - MabatiHubKenya{% endblock %}
+{% block extra_css %}
+<style>
+.summary-card {
+    min-height: 100%;
+}
+.step-badge {
+    width: 3rem;
+    height: 3rem;
+    line-height: 3rem;
+    border-radius: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row align-items-start justify-content-between gap-3 mb-4">
+            <div>
+                <h1 class="display-6">Request Your Official Quote</h1>
+                <p class="text-muted">Confirm your roof estimate and submit your project details so our sales team can generate a formal quotation.</p>
+            </div>
+            <div>
+                <a href="{% url 'roof_calculator' %}" class="btn btn-outline-primary">Back to Calculator</a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card shadow-sm summary-card p-4">
+                    <div class="mb-4">
+                        <p class="text-uppercase text-secondary small mb-1">Estimate Summary</p>
+                        <h3 class="mb-0">Request Quote</h3>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Roof Type</span>
+                            <strong>{{ hidden_data.roofType }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Dimension</span>
+                            <strong>{{ hidden_data.length }}m × {{ hidden_data.width }}m</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Pitch</span>
+                            <strong>{{ hidden_data.pitch }}°</strong>
+                        </div>
+                    </div>
+                    <div class="mb-4 border rounded-3 p-3 bg-white">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-secondary">Material Cost</small>
+                            <strong>KES {{ estimate.material_cost|floatformat:0 }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-secondary">Labour Cost</small>
+                            <strong>KES {{ estimate.labour_cost|floatformat:0 }}</strong>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total</span>
+                            <span>KES {{ estimate.grand_total|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <p class="text-muted small mb-1">Estimate details</p>
+                        <p class="mb-1"><strong>Sheets</strong>: {{ estimate.recommended_sheets }}</p>
+                        <p class="mb-1"><strong>Ridge Caps</strong>: {{ estimate.ridge_caps }}</p>
+                        <p class="mb-1"><strong>Timber</strong>: {{ estimate.timber_length }} m</p>
+                        <p class="mb-1"><strong>Rainwater</strong>: {{ estimate.rainwater_litres }} L</p>
+                    </div>
+                    <div class="alert alert-info py-3">
+                        <div class="fw-semibold">Next step</div>
+                        <p class="mb-0 small">Submit your details and our sales team will get back to you within 24 hours with a formal quotation and next steps.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm p-4">
+                    <div class="mb-4">
+                        <div class="row row-cols-1 row-cols-md-3 g-3">
+                            <div class="col">
+                                <div class="d-flex align-items-center gap-3 bg-white rounded-4 p-3 shadow-sm">
+                                    <div class="step-badge bg-primary text-white text-center">1</div>
+                                    <div>
+                                        <div class="small text-uppercase text-secondary">Estimate</div>
+                                        <strong>Calculated</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex align-items-center gap-3 bg-white rounded-4 p-3 shadow-sm">
+                                    <div class="step-badge bg-warning text-dark text-center">2</div>
+                                    <div>
+                                        <div class="small text-uppercase text-secondary">Details</div>
+                                        <strong>Submitted</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex align-items-center gap-3 bg-white rounded-4 p-3 shadow-sm">
+                                    <div class="step-badge bg-success text-white text-center">3</div>
+                                    <div>
+                                        <div class="small text-uppercase text-secondary">Quote</div>
+                                        <strong>Tracking</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="h5 mb-3">Complete your quote request</h3>
+                    <form method="post" action="" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                {{ form.customer_full_name.label_tag }}
+                                {{ form.customer_full_name }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.customer_phone.label_tag }}
+                                {{ form.customer_phone }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.customer_email.label_tag }}
+                                {{ form.customer_email }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.project_location.label_tag }}
+                                {{ form.project_location }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.project_county.label_tag }}
+                                {{ form.project_county }}
+                            </div>
+                            <div class="col-12">
+                                {{ form.customer_notes.label_tag }}
+                                {{ form.customer_notes }}
+                            </div>
+                        </div>
+                        {% for key, value in hidden_data.items %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary btn-lg">Submit Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
