@@ -41,10 +41,17 @@
                             <span class="text-muted">Roof Type</span>
                             <strong>{{ hidden_data.roofType }}</strong>
                         </div>
+                        {% if hidden_data.calculationMethod == 'direct_area' %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Area</span>
+                            <strong>{{ hidden_data.directArea }} m²</strong>
+                        </div>
+                        {% else %}
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-muted">Dimension</span>
                             <strong>{{ hidden_data.length }}m × {{ hidden_data.width }}m</strong>
                         </div>
+                        {% endif %}
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-muted">Pitch</span>
                             <strong>{{ hidden_data.pitch }}°</strong>
