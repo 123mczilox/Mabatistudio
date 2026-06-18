@@ -1,11 +1,12 @@
 import uuid
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 from django.urls import reverse
-from core.supa_storage import upload_image
+from core.supa_storage import upload_image, get_public_url
 
 
 class ProductType(models.Model):
@@ -99,8 +100,8 @@ class Product(models.Model):
         # STEP 2: save first (important)
         super().save(*args, **kwargs)
 
-        # STEP 3: upload to Supabase safely
-        if self.image and not self.image_url:
+        # STEP 3: upload to Supabase safely only when not using Django S3 storage
+        if self.image and not self.image_url and not settings.DJANGO_USE_S3:
             try:
                 with self.image.open("rb") as f:
                     url = upload_image(f, self.image.name)
@@ -139,14 +140,21 @@ class Product(models.Model):
 
     @property
     def main_image_url(self):
-        from core.supa_storage import get_public_url
-        
         if self.image_url:
             return self.image_url
 
+        if self.image:
+            try:
+                return self.image.url
+            except Exception:
+                return get_public_url(str(self.image))
+
         first = self.images.first() if hasattr(self, 'images') else None
         if first and first.image:
-            return get_public_url(str(first.image))
+            try:
+                return first.image.url
+            except Exception:
+                return get_public_url(str(first.image))
 
         return ''
 
@@ -176,8 +184,10 @@ class ProductImage(models.Model):
     @property
     def image_url(self):
         if self.image:
-            from core.supa_storage import get_public_url
-            return get_public_url(str(self.image))
+            try:
+                return self.image.url
+            except Exception:
+                return get_public_url(str(self.image))
         return ''
 
     def __str__(self):
@@ -359,8 +369,10 @@ class GalleryImage(models.Model):
     @property
     def image_url(self):
         if self.image:
-            from core.supa_storage import get_public_url
-            return get_public_url(str(self.image))
+            try:
+                return self.image.url
+            except Exception:
+                return get_public_url(str(self.image))
         return ''
 
     def __str__(self):
