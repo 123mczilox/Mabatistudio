@@ -4,7 +4,7 @@ from supabase import create_client
 import os
 import traceback
 from pathlib import Path
-from io import BufferedReader, FileIO, BytesIO
+from io import BufferedReader, FileIO
 from django.db.models.fields.files import FieldFile
 
 # Read env vars but avoid creating a client at import-time if values are missing/invalid.
@@ -54,22 +54,18 @@ def _normalize_upload_file(file):
     if isinstance(file, FieldFile):
         if not file.name:
             raise ValueError('Cannot upload empty Django FieldFile')
-        if file.file:
-            return file.file
         if hasattr(file, 'path') and file.path:
             return Path(file.path)
-        if hasattr(file, 'read'):
-            return file
-        raise ValueError('Django FieldFile has no readable content or path')
+        file = file.file
 
     if isinstance(file, (BufferedReader, FileIO)):
         return file
 
-    if hasattr(file, 'read'):
+    if isinstance(file, bytes):
         return file
 
-    if isinstance(file, bytes):
-        return BytesIO(file)
+    if hasattr(file, 'read'):
+        return file
 
     return Path(file)
 

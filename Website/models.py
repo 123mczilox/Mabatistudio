@@ -103,8 +103,7 @@ class Product(models.Model):
         # STEP 3: upload to Supabase safely only when not using Django S3 storage
         if self.image and not self.image_url and not settings.DJANGO_USE_S3:
             try:
-                with self.image.open("rb") as f:
-                    url = upload_image(f, self.image.name)
+                url = upload_image(self.image.path, self.image.name)
 
                 if url:
                     self.image_url = url
@@ -369,8 +368,7 @@ class GalleryImage(models.Model):
 
         if self.image:
             try:
-                with self.image.open("rb") as f:
-                    upload_image(f, self.image.name)
+                upload_image(self.image.path, self.image.name)
             except Exception as e:
                 print("Gallery upload failed:", e)
 
