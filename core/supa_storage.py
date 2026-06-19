@@ -3,6 +3,9 @@
 from supabase import create_client
 import os
 import traceback
+from pathlib import Path
+from io import BufferedReader, FileIO, BytesIO
+from django.db.models.fields.files import FieldFile
 
 # Read env vars but avoid creating a client at import-time if values are missing/invalid.
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
@@ -47,16 +50,41 @@ def get_public_url(filepath):
     return f"{SUPABASE_PUBLIC_URL}/{filepath}"
 
 
+def _normalize_upload_file(file):
+    if isinstance(file, FieldFile):
+        if not file.name:
+            raise ValueError('Cannot upload empty Django FieldFile')
+        if file.file:
+            return file.file
+        if hasattr(file, 'path') and file.path:
+            return Path(file.path)
+        if hasattr(file, 'read'):
+            return file
+        raise ValueError('Django FieldFile has no readable content or path')
+
+    if isinstance(file, (BufferedReader, FileIO)):
+        return file
+
+    if hasattr(file, 'read'):
+        return file
+
+    if isinstance(file, bytes):
+        return BytesIO(file)
+
+    return Path(file)
+
+
 def upload_image(file, filename):
     if supabase is None:
         raise RuntimeError('SUPABASE_URL and SUPABASE_KEY must be set to upload images.')
 
     try:
         filename = filename.replace("\\", "/")
+        upload_file = _normalize_upload_file(file)
 
         response = supabase.storage.from_(BUCKET_NAME).upload(
             path=filename,
-            file=file
+            file=upload_file
         )
 
         if not response or not getattr(response, "full_path", None):
@@ -67,7 +95,7 @@ def upload_image(file, filename):
 
         public_url = supabase.storage.from_(BUCKET_NAME).get_public_url(filename)
         return public_url
-    
+
     except Exception as e:
         print("UPLOAD ERROR:", e)
         traceback.print_exc()
