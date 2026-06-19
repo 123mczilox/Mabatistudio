@@ -62,6 +62,8 @@ class Command(BaseCommand):
                         with open(image_path, 'rb') as f:
                             url = upload_image(f, img.image.name)
                         if url:
+                            img.supabase_url = url
+                            img.save(update_fields=['supabase_url'])
                             self.stdout.write(self.style.SUCCESS(f'✓ {img.title or img.image.name}'))
                         else:
                             self.stdout.write(self.style.ERROR(f'✗ {img.title}: Upload returned None'))

@@ -1,11 +1,14 @@
 
 
 from supabase import create_client
+import logging
 import os
 import traceback
 from pathlib import Path
 from io import BufferedReader, FileIO
 from django.db.models.fields.files import FieldFile
+
+logger = logging.getLogger(__name__)
 
 # Read env vars but avoid creating a client at import-time if values are missing/invalid.
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
@@ -78,6 +81,13 @@ def upload_image(file, filename):
         filename = filename.replace("\\", "/")
         upload_file = _normalize_upload_file(file)
 
+        if isinstance(upload_file, Path):
+            if not upload_file.exists():
+                raise FileNotFoundError(f"Upload file not found: {upload_file}")
+            upload_file = str(upload_file)
+
+        logger.debug("Uploading file to Supabase: %s (type=%s)", filename, type(upload_file))
+
         response = supabase.storage.from_(BUCKET_NAME).upload(
             path=filename,
             file=upload_file
@@ -93,8 +103,7 @@ def upload_image(file, filename):
         return public_url
 
     except Exception as e:
-        print("UPLOAD ERROR:", e)
-        traceback.print_exc()
+        logger.exception("Supabase upload failed for %s", filename)
         return None
 
         

@@ -1,3 +1,4 @@
+import logging
 import uuid
 from decimal import Decimal
 
@@ -108,9 +109,11 @@ class Product(models.Model):
                 if url:
                     self.image_url = url
                     Product.objects.filter(pk=self.pk).update(image_url=url)
+                else:
+                    raise RuntimeError('Supabase upload returned no URL')
 
             except Exception as e:
-                print("Image upload failed:", e)
+                logging.getLogger(__name__).exception('Product image upload failed for %s', self.image.name)
 
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
@@ -362,26 +365,30 @@ class GalleryImage(models.Model):
     caption = models.TextField(blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     order = models.PositiveSmallIntegerField(default=0)
-    #debug ses 1 (uploads to supabase)
+    supabase_url = models.URLField(blank=True, null=True)
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if self.image:
+        if self.image and not self.supabase_url and not settings.DJANGO_USE_S3:
             try:
-                upload_image(self.image.path, self.image.name)
+                url = upload_image(self.image.path, self.image.name)
+                if url:
+                    self.supabase_url = url
+                    GalleryImage.objects.filter(pk=self.pk).update(supabase_url=url)
             except Exception as e:
-                print("Gallery upload failed:", e)
+                logging.getLogger(__name__).exception('GalleryImage upload failed for %s', self.image.name)
 
     class Meta:
         ordering = ['order', '-uploaded_at']
 
     @property
     def image_url(self):
+        if self.supabase_url:
+            return self.supabase_url
+
         if self.image:
-            # try:
-            #     return self.image.url
-            # except Exception:
-                return get_public_url(str(self.image))
+            return get_public_url(str(self.image))
         return ''
 
     def __str__(self):
