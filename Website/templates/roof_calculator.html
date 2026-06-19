@@ -37,25 +37,19 @@
                 <p class="lead text-white-75 mb-4">Enter your building dimensions, choose the roof type, profile, gauge and the system will estimate area, sheets, ridge caps, screws, nails, timber and total cost.</p>
                 <a href="#estimate-form" class="btn btn-outline-light btn-lg me-3">Start Estimate</a>
                 <a href="{% url 'contact' %}" class="btn btn-light btn-lg">Request Support</a>
-            </div>
-            <div class="col-lg-5">
-                <div class="card rounded-4 p-4 shadow-lg" style="background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.16);">
-                    <h5 class="text-white mb-3">Why use this estimator?</h5>
-                    <ul class="list-unstyled text-white-75 lh-lg">
-                        <li><i class="fa-solid fa-check text-warning me-2"></i>Fast roof area and material quantities.</li>
-                        <li><i class="fa-solid fa-check text-warning me-2"></i>Compare gauge and profile costs instantly.</li>
-                        <li><i class="fa-solid fa-check text-warning me-2"></i>Save a private estimate for later review.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+            }
 
-<section id="estimate-form" class="py-5">
-    <div class="container">
-        {% if messages %}
-            <div class="alert alert-success border-0 shadow-sm mb-4">
+            formFields.forEach((field) => {
+                const element = document.getElementById(field);
+                if (!element) return;
+                element.addEventListener('input', updateEstimate);
+                if (element.type === 'checkbox') {
+                    element.addEventListener('change', updateEstimate);
+                }
+            });
+
+            const productSelect = document.getElementById('product');
+            const productVariantSelect = document.getElementById('productVariant');
                 {% for message in messages %}
                     <div>{{ message }}</div>
                 {% endfor %}
@@ -97,15 +91,15 @@
                                 <div class="row g-3">
                                     <div class="col-6">
                                         <label for="length" class="form-label">Roof Building Length (m)</label>
-                                        <input id="length" name="length" type="number" min="0" step="0.1" class="form-control" placeholder="50" value="{{ initial_data.length }}">
+                                        <input id="length" name="length" type="number" min="0" step="0.1" class="form-control" placeholder="50" value="{{ initial_data.length }}" required>
                                     </div>
                                     <div class="col-6">
                                         <label for="width" class="form-label">Roof Building Width (m)</label>
-                                        <input id="width" name="width" type="number" min="0" step="0.1" class="form-control" placeholder="100" value="{{ initial_data.width }}">
+                                        <input id="width" name="width" type="number" min="0" step="0.1" class="form-control" placeholder="100" value="{{ initial_data.width }}" required>
                                     </div>
                                     <div class="col-6">
                                         <label for="eaves" class="form-label">Roof Overhang / Eaves (m)</label>
-                                        <input id="eaves" name="eaves" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.eaves }}">
+                                        <input id="eaves" name="eaves" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.eaves }}" required>
                                         <div class="form-text">Add roof overhang measured from the wall edge to the eaves/verge.</div>
                                     </div>
                                 </div>
@@ -114,7 +108,7 @@
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label for="directArea" class="form-label">Total Roof Area (m²)</label>
-                                        <input id="directArea" name="directArea" type="number" min="0" step="0.1" class="form-control" placeholder="e.g., 200" value="{{ initial_data.directArea }}">
+                                        <input id="directArea" name="directArea" type="number" min="0" step="0.1" class="form-control" placeholder="e.g., 200" value="{{ initial_data.directArea }}" required>
                                         <div class="form-text">Enter the total roofing area if you have a roof plan or already know the square meters needed.</div>
                                     </div>
                                 </div>
@@ -124,7 +118,7 @@
                             </div>
                             <div class="col-6">
                                 <label for="roofType" class="form-label">Roof Type</label>
-                                <select id="roofType" name="roofType" class="form-select">
+                                <select id="roofType" name="roofType" class="form-select" required>
                                     {% for option in roof_types %}
                                         <option value="{{ option }}" {% if initial_data.roofType == option %}selected{% endif %}>{{ option }}</option>
                                     {% endfor %}
@@ -132,7 +126,7 @@
                             </div>
                             <div class="col-6">
                                 <label for="pitch" class="form-label">Roof Pitch (°)</label>
-                                <select id="pitch" name="pitch" class="form-select">
+                                <select id="pitch" name="pitch" class="form-select" required>
                                     {% for option in pitch_options %}
                                         <option value="{{ option }}" {% if initial_data.pitch == option %}selected{% endif %}>{{ option }}</option>
                                     {% endfor %}
@@ -155,7 +149,7 @@
                             </div>
                             <div class="col-6" id="profileWrapper">
                                 <label for="profile" class="form-label">Roofing Profile</label>
-                                <select id="profile" name="profile" class="form-select">
+                                <select id="profile" name="profile" class="form-select" required>
                                     {% if profiles %}
                                         {% for profile in profiles %}
                                             <option value="{{ profile.pk }}" data-cover-width="{{ profile.cover_width }}" data-sheet-price="{{ profile.default_sheet_price }}" {% if initial_data.profile == profile.pk|stringformat:"s" %}selected{% endif %}>{{ profile.name }}</option>
@@ -167,7 +161,7 @@
                             </div>
                             <div class="col-6" id="gaugeWrapper">
                                 <label for="gauge" class="form-label">Gauge</label>
-                                <select id="gauge" name="gauge" class="form-select">
+                                <select id="gauge" name="gauge" class="form-select" required>
                                     {% if gauges %}
                                         {% for gauge in gauges %}
                                             <option value="{{ gauge.pk }}" data-price-multiplier="{{ gauge.price_multiplier }}" data-additional-cost="{{ gauge.additional_cost }}" {% if initial_data.gauge == gauge.pk|stringformat:"s" %}selected{% endif %}>{{ gauge.name }}</option>
@@ -179,7 +173,7 @@
                             </div>
                             <div class="col-6">
                                 <label for="color" class="form-label">Color</label>
-                                <select id="color" name="color" class="form-select">
+                                <select id="color" name="color" class="form-select" required>
                                     {% if color_variants %}
                                         {% for color in color_variants %}
                                             <option value="{{ color.name }}" {% if initial_data.color == color.name %}selected{% endif %}>{{ color.name }}</option>
@@ -191,27 +185,27 @@
                             </div>
                             <div class="col-6">
                                 <label for="sheetTotalWidth" class="form-label">Sheet Total Width (m)</label>
-                                <input id="sheetTotalWidth" name="sheetTotalWidth" type="number" min="0" step="0.01" class="form-control" placeholder="1.05" value="{{ initial_data.sheetTotalWidth }}">
+                                <input id="sheetTotalWidth" name="sheetTotalWidth" type="number" min="0" step="0.01" class="form-control" placeholder="1.05" value="{{ initial_data.sheetTotalWidth }}" required>
                                 <div class="form-text">Actual sheet width before side lap is subtracted.</div>
                             </div>
                             <div class="col-6">
                                 <label for="sheetTotalLength" class="form-label">Sheet Total Length (m)</label>
-                                <input id="sheetTotalLength" name="sheetTotalLength" type="number" min="0" step="0.01" class="form-control" placeholder="3.05" value="{{ initial_data.sheetTotalLength }}">
+                                <input id="sheetTotalLength" name="sheetTotalLength" type="number" min="0" step="0.01" class="form-control" placeholder="3.05" value="{{ initial_data.sheetTotalLength }}" required>
                                 <div class="form-text">Actual sheet length before end laps and overhangs.</div>
                             </div>
                             <div class="col-6">
                                 <label for="sideLap" class="form-label">Side Lap (m)</label>
-                                <input id="sideLap" name="sideLap" type="number" min="0" step="0.01" class="form-control" placeholder="0.05" value="{{ initial_data.sideLap }}">
+                                <input id="sideLap" name="sideLap" type="number" min="0" step="0.01" class="form-control" placeholder="0.05" value="{{ initial_data.sideLap }}" required>
                                 <div class="form-text">Side overlap that reduces effective sheet width.</div>
                             </div>
                             <div class="col-6">
                                 <label for="endLap" class="form-label">End Lap (m)</label>
-                                <input id="endLap" name="endLap" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.endLap }}">
+                                <input id="endLap" name="endLap" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.endLap }}" required>
                                 <div class="form-text">End lap between vertically stacked sheets.</div>
                             </div>
                             <div class="col-6">
                                 <label for="endOverhang" class="form-label">End Overhang (m)</label>
-                                <input id="endOverhang" name="endOverhang" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.endOverhang }}">
+                                <input id="endOverhang" name="endOverhang" type="number" min="0" step="0.01" class="form-control" placeholder="0.10" value="{{ initial_data.endOverhang }}" required>
                                 <div class="form-text">Extra overhang added to sheet length for eave projection.</div>
                             </div>
                             <div class="col-6">
@@ -221,27 +215,27 @@
                             </div>
                             <div class="col-6">
                                 <label for="ridgePrice" class="form-label">Ridge Cap Price (KES / 2m)</label>
-                                <input id="ridgePrice" name="ridgePrice" type="number" min="0" step="1" class="form-control" value="{{ initial_data.ridgePrice }}">
+                                <input id="ridgePrice" name="ridgePrice" type="number" min="0" step="1" class="form-control" value="{{ initial_data.ridgePrice }}" required>
                             </div>
                             <div class="col-6">
                                 <label for="screwPrice" class="form-label">Screw Price (KES each)</label>
-                                <input id="screwPrice" name="screwPrice" type="number" min="0" step="0.1" class="form-control" value="{{ initial_data.screwPrice }}">
+                                <input id="screwPrice" name="screwPrice" type="number" min="0" step="0.1" class="form-control" value="{{ initial_data.screwPrice }}" required>
                             </div>
                             <div class="col-6">
                                 <label for="nailPrice" class="form-label">Nail Price (KES each)</label>
-                                <input id="nailPrice" name="nailPrice" type="number" min="0" step="0.1" class="form-control" value="{{ initial_data.nailPrice }}">
+                                <input id="nailPrice" name="nailPrice" type="number" min="0" step="0.1" class="form-control" value="{{ initial_data.nailPrice }}" required>
                             </div>
                             <div class="col-6">
                                 <label for="timberPrice" class="form-label">Timber Price (KES / m)</label>
-                                <input id="timberPrice" name="timberPrice" type="number" min="0" step="1" class="form-control" value="{{ initial_data.timberPrice }}">
+                                <input id="timberPrice" name="timberPrice" type="number" min="0" step="1" class="form-control" value="{{ initial_data.timberPrice }}" required>
                             </div>
                             <div class="col-6">
                                 <label for="labourCost" class="form-label">Labour Cost (KES)</label>
-                                <input id="labourCost" name="labourCost" type="number" min="0" step="1" class="form-control" value="{{ initial_data.labourCost }}">
+                                <input id="labourCost" name="labourCost" type="number" min="0" step="1" class="form-control" value="{{ initial_data.labourCost }}" required>
                             </div>
                             <div class="col-12">
                                 <label for="rainfall" class="form-label">Average Annual Rainfall (mm)</label>
-                                <input id="rainfall" name="rainfall" type="number" min="0" step="1" class="form-control" value="{{ initial_data.rainfall }}">
+                                <input id="rainfall" name="rainfall" type="number" min="0" step="1" class="form-control" value="{{ initial_data.rainfall }}" required>
                             </div>
                             <div class="col-12">
                                 <div class="row gx-2 gy-2">
@@ -378,57 +372,6 @@
                         </div>
                     </div>
                     
-                    <div class="col-12">
-                        <div class="card shadow-sm result-card p-4">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <div>
-                                    <p class="mb-1 text-uppercase text-secondary small">Gauge/Profile Comparison</p>
-                                    <h4 class="mb-0">Compare alternatives</h4>
-                                </div>
-                                <span class="badge bg-info text-dark">Compare</span>
-                            </div>
-                            <div class="row g-3">
-                                <div class="col-sm-6">
-                                    <label for="compareProfile" class="form-label">Compare Profile</label>
-                                    <select id="compareProfile" class="form-select">
-                                        {% for profile in profiles %}
-                                            <option value="{{ profile.pk }}" data-cover-width="{{ profile.cover_width }}" data-sheet-price="{{ profile.default_sheet_price }}" {% if profile.pk|stringformat:"s" == initial_data.profile %}selected{% endif %}>{{ profile.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-sm-6">
-                                    <label for="compareGauge" class="form-label">Compare Gauge</label>
-                                    <select id="compareGauge" class="form-select">
-                                        {% for gauge in gauges %}
-                                            <option value="{{ gauge.pk }}" data-price-multiplier="{{ gauge.price_multiplier }}" data-additional-cost="{{ gauge.additional_cost }}" {% if gauge.pk|stringformat:"s" == initial_data.gauge %}selected{% endif %}>{{ gauge.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-12">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="border rounded-3 p-3">
-                                                <p class="mb-1 text-uppercase text-secondary small">Current Total</p>
-                                                <div class="fw-semibold" id="currentComparisonTotal">KES 0</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="border rounded-3 p-3">
-                                                <p class="mb-1 text-uppercase text-secondary small">Alternative Total</p>
-                                                <div class="fw-semibold" id="alternativeComparisonTotal">KES 0</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="border rounded-3 p-3 bg-light">
-                                                <p class="mb-1 text-uppercase text-secondary small">Difference</p>
-                                                <div class="fw-semibold" id="comparisonDifference">KES 0</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </form>
@@ -500,25 +443,42 @@ function getSelectedProductOption() {
     return select && select.options[select.selectedIndex];
 }
 
+function setCalculationMode(mode) {
+    const dimensionsMode = document.getElementById('dimensionsMode');
+    const directAreaMode = document.getElementById('directAreaMode');
+    const dimensionsFields = ['length', 'width', 'eaves'];
+    const directAreaField = document.getElementById('directArea');
+
+    if (mode === 'dimensions') {
+        dimensionsMode.style.display = 'block';
+        directAreaMode.style.display = 'none';
+        dimensionsFields.forEach((id) => {
+            const field = document.getElementById(id);
+            if (field) field.disabled = false;
+        });
+        if (directAreaField) directAreaField.disabled = true;
+    } else {
+        dimensionsMode.style.display = 'none';
+        directAreaMode.style.display = 'block';
+        dimensionsFields.forEach((id) => {
+            const field = document.getElementById(id);
+            if (field) field.disabled = true;
+        });
+        if (directAreaField) directAreaField.disabled = false;
+    }
+}
+
 // Toggle between dimensions and direct area modes
 document.querySelectorAll('input[name="calculationMethod"]').forEach(radio => {
     radio.addEventListener('change', function() {
-        const dimensionsMode = document.getElementById('dimensionsMode');
-        const directAreaMode = document.getElementById('directAreaMode');
-        if (this.value === 'dimensions') {
-            dimensionsMode.style.display = 'block';
-            directAreaMode.style.display = 'none';
-        } else {
-            dimensionsMode.style.display = 'none';
-            directAreaMode.style.display = 'block';
-        }
+        setCalculationMode(this.value);
+        updateEstimate();
     });
 });
 
 // Initialize visibility on page load
 const initialMethod = document.querySelector('input[name="calculationMethod"]:checked')?.value || 'dimensions';
-document.getElementById('dimensionsMode').style.display = initialMethod === 'dimensions' ? 'block' : 'none';
-document.getElementById('directAreaMode').style.display = initialMethod === 'direct_area' ? 'block' : 'none';
+setCalculationMode(initialMethod);
 
 function validateForm() {
     const calculationMethod = document.querySelector('input[name="calculationMethod"]:checked')?.value || 'dimensions';
@@ -698,85 +658,6 @@ function updateEstimate() {
     document.getElementById('materialCost').textContent = numberFormat.format(materialCost);
     document.getElementById('labourCostResult').textContent = numberFormat.format(labour);
     document.getElementById('grandTotal').textContent = numberFormat.format(grandTotal);
-    document.getElementById('currentComparisonTotal').textContent = numberFormat.format(grandTotal);
-    updateComparison(grandTotal);
-}
-
-function getCompareOption(selectId) {
-    const select = document.getElementById(selectId);
-    return select && select.options[select.selectedIndex];
-}
-
-function calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, eaves, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber, sheetTotalWidth, sheetTotalLength, sideLap, endLap, endOverhang, calculationMethod, directArea) {
-    const compareSheetPriceBase = Number(compareProfileOption?.dataset.sheetPrice || 0);
-    const compareCoverWidth = getCoverWidth(compareProfileOption);
-    const compareGaugeMultiplier = Number(compareGaugeOption?.dataset.priceMultiplier || 1.0);
-    const compareGaugeAdditionalCost = Number(compareGaugeOption?.dataset.additionalCost || 0);
-    const compareSheetPrice = compareSheetPriceBase ? compareSheetPriceBase * compareGaugeMultiplier + compareGaugeAdditionalCost : 0;
-    let roofArea = 0;
-    if (calculationMethod === 'direct_area') {
-        roofArea = Number(directArea) || 0;
-    } else {
-        const planLength = Math.max(0, length + eaves * 2);
-        const planWidth = Math.max(0, width + eaves * 2);
-        const footprint = planLength * planWidth;
-        const slopeMultiplier = pitch > 0 ? 1 / Math.cos(pitch * Math.PI / 180) : 1;
-        roofArea = footprint ? footprint * getTypeFactor(roofType) * slopeMultiplier : 0;
-    }
-
-    let effectiveSheetArea = 0;
-    if (sheetTotalWidth > 0 && sheetTotalLength > 0) {
-        const effectiveSheetWidth = Math.max(0, sheetTotalWidth - sideLap);
-        const effectiveSheetLength = Math.max(0, sheetTotalLength - endLap - endOverhang);
-        effectiveSheetArea = effectiveSheetWidth * effectiveSheetLength;
-    }
-    if (!effectiveSheetArea) {
-        effectiveSheetArea = compareCoverWidth;
-    }
-
-    const baseSheets = effectiveSheetArea ? roofArea / effectiveSheetArea : 0;
-    const wastage = getWastage(roofType);
-    const recommendedSheets = Math.max(0, Math.ceil(baseSheets * (1 + wastage)));
-    const ridgeLength = getRidgeLength(roofType, length, width);
-    const ridgeCaps = Math.max(0, Math.ceil(ridgeLength / 2));
-    const screws = includeScrews ? Math.max(0, Math.ceil(roofArea * 9)) : 0;
-    const nails = includeNails ? Math.max(0, Math.ceil(roofArea * 6)) : 0;
-    const timberLength = includeTimber ? Math.max(0, Math.ceil(roofArea * getTimberFactor(roofType))) : 0;
-    const sheetCost = recommendedSheets * compareSheetPrice;
-    const ridgeCost = ridgeCaps * ridgePrice;
-    const screwCost = screws * screwPrice;
-    const nailCost = nails * nailPrice;
-    const timberCost = timberLength * timberPrice;
-    const materialCost = sheetCost + ridgeCost + screwCost + nailCost + timberCost;
-    return materialCost + labour;
-}
-
-function updateComparison(currentTotal) {
-    const compareProfileOption = getCompareOption('compareProfile');
-    const compareGaugeOption = getCompareOption('compareGauge');
-    const roofType = document.getElementById('roofType').value;
-    const length = Number(document.getElementById('length').value) || 0;
-    const width = Number(document.getElementById('width').value) || 0;
-    const eaves = Number(document.getElementById('eaves').value) || 0;
-    const pitch = Number(document.getElementById('pitch').value) || 0;
-    const ridgePrice = Number(document.getElementById('ridgePrice').value) || 0;
-    const screwPrice = Number(document.getElementById('screwPrice').value) || 0;
-    const nailPrice = Number(document.getElementById('nailPrice').value) || 0;
-    const timberPrice = Number(document.getElementById('timberPrice').value) || 0;
-    const labour = Number(document.getElementById('labourCost').value) || 0;
-    const includeScrews = document.getElementById('includeScrews').checked;
-    const includeNails = document.getElementById('includeNails').checked;
-    const includeTimber = document.getElementById('includeTimber').checked;
-    const sheetTotalWidth = Number(document.getElementById('sheetTotalWidth').value) || 0;
-    const sheetTotalLength = Number(document.getElementById('sheetTotalLength').value) || 0;
-    const sideLap = Number(document.getElementById('sideLap').value) || 0;
-    const endLap = Number(document.getElementById('endLap').value) || 0;
-    const endOverhang = Number(document.getElementById('endOverhang').value) || 0;
-    const calculationMethod = document.querySelector('input[name="calculationMethod"]:checked')?.value || 'dimensions';
-    const directArea = Number(document.getElementById('directArea')?.value) || 0;
-    const alternativeTotal = calculateComparisonTotal(compareProfileOption, compareGaugeOption, roofType, length, width, eaves, pitch, ridgePrice, screwPrice, nailPrice, timberPrice, labour, includeScrews, includeNails, includeTimber, sheetTotalWidth, sheetTotalLength, sideLap, endLap, endOverhang, calculationMethod, directArea);
-    document.getElementById('alternativeComparisonTotal').textContent = numberFormat.format(alternativeTotal);
-    document.getElementById('comparisonDifference').textContent = numberFormat.format(alternativeTotal - currentTotal);
 }
 
 formFields.forEach((field) => {
@@ -786,12 +667,6 @@ formFields.forEach((field) => {
     if (element.type === 'checkbox') {
         element.addEventListener('change', updateEstimate);
     }
-});
-
-['compareProfile', 'compareGauge'].forEach((field) => {
-    const element = document.getElementById(field);
-    if (!element) return;
-    element.addEventListener('change', updateEstimate);
 });
 
 const productSelect = document.getElementById('product');
