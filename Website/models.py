@@ -185,7 +185,7 @@ class ProductImage(models.Model):
     def image_url(self):
         if self.image:
             try:
-                return self.image.url
+                return self.image_url #did a change here to self.image.url
             except Exception:
                 return get_public_url(str(self.image))
         return ''
