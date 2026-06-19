@@ -37,7 +37,7 @@ class ProductImageInline(admin.TabularInline):
 
     def preview(self, obj):
         if obj.image:
-            return format_html('<img src="{}" style="height:60px;" />', obj.image.url)
+            return format_html('<img src="{}" style="height:60px;" />', obj.image_url)
         return ''
     preview.short_description = 'Preview'
 
@@ -76,7 +76,7 @@ class ProductImageAdmin(admin.ModelAdmin):
 
     def preview(self, obj):
         if obj.image:
-            return format_html('<img src="{}" style="height:60px;" />', obj.image.url)
+            return format_html('<img src="{}" style="height:60px;" />', obj.image_url)
         return ''
     preview.short_description = 'Preview'
 
@@ -160,7 +160,7 @@ class GalleryImageAdmin(admin.ModelAdmin):
 
     def preview(self, obj):
         if obj.image:
-            return format_html('<img src="{}" style="height:60px;" />', obj.image.url)
+            return format_html('<img src="{}" style="height:60px;" />', obj.image_url)
         return ''
     preview.short_description = 'Preview'
 

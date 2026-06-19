@@ -1,6 +1,8 @@
 
+
 from supabase import create_client
 import os
+import traceback
 
 # Read env vars but avoid creating a client at import-time if values are missing/invalid.
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
@@ -53,8 +55,8 @@ def upload_image(file, filename):
         filename = filename.replace("\\", "/")
 
         response = supabase.storage.from_(BUCKET_NAME).upload(
-            filename,
-            file
+            path=filename,
+            file=file
         )
 
         if not response or not getattr(response, "full_path", None):
@@ -65,7 +67,14 @@ def upload_image(file, filename):
 
         public_url = supabase.storage.from_(BUCKET_NAME).get_public_url(filename)
         return public_url
-
+    
     except Exception as e:
         print("UPLOAD ERROR:", e)
+        traceback.print_exc()
         return None
+
+        
+    
+    # except Exception as e:
+    #     print("UPLOAD ERROR:", e)
+    #     return None
