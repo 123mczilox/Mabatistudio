@@ -37,19 +37,25 @@
                 <p class="lead text-white-75 mb-4">Enter your building dimensions, choose the roof type, profile, gauge and the system will estimate area, sheets, ridge caps, screws, nails, timber and total cost.</p>
                 <a href="#estimate-form" class="btn btn-outline-light btn-lg me-3">Start Estimate</a>
                 <a href="{% url 'contact' %}" class="btn btn-light btn-lg">Request Support</a>
-            }
+            </div>
+            <div class="col-lg-5">
+                <div class="card rounded-4 p-4 shadow-lg" style="background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.16);">
+                    <h5 class="text-white mb-3">Why use this estimator?</h5>
+                    <ul class="list-unstyled text-white-75 lh-lg">
+                        <li><i class="fa-solid fa-check text-warning me-2"></i>Fast roof area and material quantities.</li>
+                        <li><i class="fa-solid fa-check text-warning me-2"></i>Estimate roofing materials and costs accurately.</li>
+                        <li><i class="fa-solid fa-check text-warning me-2"></i>Save a private estimate for later review.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-            formFields.forEach((field) => {
-                const element = document.getElementById(field);
-                if (!element) return;
-                element.addEventListener('input', updateEstimate);
-                if (element.type === 'checkbox') {
-                    element.addEventListener('change', updateEstimate);
-                }
-            });
-
-            const productSelect = document.getElementById('product');
-            const productVariantSelect = document.getElementById('productVariant');
+<section id="estimate-form" class="py-5">
+    <div class="container">
+        {% if messages %}
+            <div class="alert alert-success border-0 shadow-sm mb-4">
                 {% for message in messages %}
                     <div>{{ message }}</div>
                 {% endfor %}

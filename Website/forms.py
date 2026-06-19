@@ -39,3 +39,9 @@ class QuoteRequestForm(forms.ModelForm):
                 'placeholder': 'Additional notes or special requirements',
             }),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        required_fields = ['customer_full_name', 'customer_phone', 'customer_email', 'project_location', 'project_county']
+        for f in required_fields:
+            if f in self.fields:
+                self.fields[f].required = True
