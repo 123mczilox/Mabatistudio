@@ -144,15 +144,15 @@ class Product(models.Model):
             return self.image_url
 
         if self.image:
-            try:
-                return self.image.url
-            except Exception:
+            # try:
+            #     return self.image_url
+            # except Exception:
                 return get_public_url(str(self.image))
 
         first = self.images.first() if hasattr(self, 'images') else None
         if first and first.image:
             try:
-                return first.image.url
+                return first.image_url
             except Exception:
                 return get_public_url(str(first.image))
 
@@ -184,10 +184,11 @@ class ProductImage(models.Model):
     @property
     def image_url(self):
         if self.image:
-            try:
-                return self.image_url #did a change here to self.image.url
-            except Exception:
-                return get_public_url(str(self.image))
+             return get_public_url(str(self.image))
+            # try:
+            #     return self.image_url #did a change here to self.image.url
+            # except Exception:
+            #     return get_public_url(str(self.image))
         return ''
 
     def __str__(self):
@@ -369,9 +370,9 @@ class GalleryImage(models.Model):
     @property
     def image_url(self):
         if self.image:
-            try:
-                return self.image.url
-            except Exception:
+            # try:
+            #     return self.image.url
+            # except Exception:
                 return get_public_url(str(self.image))
         return ''
 
