@@ -363,6 +363,16 @@ class GalleryImage(models.Model):
     caption = models.TextField(blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     order = models.PositiveSmallIntegerField(default=0)
+    #debug ses 1 (uploads to supabase)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.image:
+            try:
+                with self.image.open("rb") as f:
+                    upload_image(f, self.image.name)
+            except Exception as e:
+                print("Gallery upload failed:", e)
 
     class Meta:
         ordering = ['order', '-uploaded_at']
