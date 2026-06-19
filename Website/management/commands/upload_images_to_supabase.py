@@ -43,6 +43,8 @@ class Command(BaseCommand):
                         with open(image_path, 'rb') as f:
                             url = upload_image(f, img.image.name)
                         if url:
+                            img.supabase_url = url
+                            img.save(update_fields=['supabase_url'])
                             self.stdout.write(self.style.SUCCESS(f'✓ {img.product.name} - {img.get_view_type_display()}: {img.image.name}'))
                         else:
                             self.stdout.write(self.style.ERROR(f'✗ {img.product.name}: Upload returned None'))

@@ -146,17 +146,11 @@ class Product(models.Model):
             return self.image_url
 
         if self.image:
-            # try:
-            #     return self.image_url
-            # except Exception:
-                return get_public_url(str(self.image))
+            return get_public_url(str(self.image))
 
         first = self.images.first() if hasattr(self, 'images') else None
         if first and first.image:
-            try:
-                return first.image_url
-            except Exception:
-                return get_public_url(str(first.image))
+            return first.image_url
 
         return ''
 
@@ -176,6 +170,7 @@ class ProductImage(models.Model):
     )
 
     image = models.ImageField(upload_to='products/gallery/')
+    supabase_url = models.URLField(blank=True, null=True)
     view_type = models.CharField(max_length=20, choices=VIEW_CHOICES, default='front')
     alt_text = models.CharField(max_length=200, blank=True)
     order = models.PositiveSmallIntegerField(default=0)
@@ -183,14 +178,25 @@ class ProductImage(models.Model):
     class Meta:
         ordering = ['order']
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.image and not self.supabase_url and not settings.DJANGO_USE_S3:
+            try:
+                url = upload_image(self.image.path, self.image.name)
+                if url:
+                    self.supabase_url = url
+                    ProductImage.objects.filter(pk=self.pk).update(supabase_url=url)
+            except Exception:
+                logging.getLogger(__name__).exception('ProductImage upload failed for %s', self.image.name)
+
     @property
     def image_url(self):
+        if self.supabase_url:
+            return self.supabase_url
+
         if self.image:
-             return get_public_url(str(self.image))
-            # try:
-            #     return self.image_url #did a change here to self.image.url
-            # except Exception:
-            #     return get_public_url(str(self.image))
+            return get_public_url(str(self.image))
         return ''
 
     def __str__(self):
